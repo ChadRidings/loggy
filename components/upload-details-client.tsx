@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUploadUiStore } from "@/store/upload-ui-store";
 
 type Upload = {
@@ -98,6 +98,8 @@ function statusBadgeClass(status: string): string {
 
 export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   const { filters, setFilter, resetFilters, selectedAnomalyId, setSelectedAnomalyId } = useUploadUiStore();
+  const queryClient = useQueryClient();
+  const previousStatusRef = useRef<string | undefined>(undefined);
 
   const [eventRows, setEventRows] = useState<EventRow[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -112,14 +114,18 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
     }
   });
 
+  const isProcessing = uploadQuery.data?.status === "processing" || uploadQuery.data?.status === "queued";
+
   const timelineQuery = useQuery({
     queryKey: ["timeline", uploadId],
-    queryFn: () => fetchTimeline(uploadId)
+    queryFn: () => fetchTimeline(uploadId),
+    refetchInterval: isProcessing ? 3000 : false
   });
 
   const anomalyQuery = useQuery({
     queryKey: ["anomalies", uploadId],
-    queryFn: () => fetchAnomalies(uploadId)
+    queryFn: () => fetchAnomalies(uploadId),
+    refetchInterval: isProcessing ? 3000 : false
   });
 
   const eventFilterParams = useMemo(
@@ -136,8 +142,26 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
 
   const eventsQuery = useQuery({
     queryKey: ["events", uploadId, eventFilterParams],
-    queryFn: () => fetchEvents({ uploadId, cursor: null, filters: eventFilterParams })
+    queryFn: () => fetchEvents({ uploadId, cursor: null, filters: eventFilterParams }),
+    refetchInterval: isProcessing ? 3000 : false
   });
+
+  useEffect(() => {
+    const currentStatus = uploadQuery.data?.status;
+    const previousStatus = previousStatusRef.current;
+
+    const finishedNow =
+      (previousStatus === "queued" || previousStatus === "processing") &&
+      (currentStatus === "completed" || currentStatus === "partial_success" || currentStatus === "failed");
+
+    if (finishedNow) {
+      void queryClient.invalidateQueries({ queryKey: ["timeline", uploadId] });
+      void queryClient.invalidateQueries({ queryKey: ["anomalies", uploadId] });
+      void queryClient.invalidateQueries({ queryKey: ["events", uploadId] });
+    }
+
+    previousStatusRef.current = currentStatus;
+  }, [queryClient, uploadId, uploadQuery.data?.status]);
 
   useEffect(() => {
     if (!eventsQuery.data) {
@@ -171,6 +195,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           <div>
             <h1 className="text-2xl font-semibold text-slate-900">{uploadQuery.data?.filename ?? "Upload details"}</h1>
             <p className="mt-1 text-sm text-slate-600">Uploaded {uploadQuery.data ? new Date(uploadQuery.data.uploaded_at).toLocaleString() : "-"}</p>
+            {isProcessing ? <p className="mt-1 text-xs text-blue-700">Auto-refreshing timeline, events, and anomalies...</p> : null}
           </div>
           <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadgeClass(uploadQuery.data?.status ?? "queued")}`}>
             {uploadQuery.data?.status ?? "loading"}
