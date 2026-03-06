@@ -1,36 +1,34 @@
-import NextAuth, { getServerSession, type NextAuthOptions } from "next-auth";
+import { getServerSession, type NextAuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { z } from "zod";
 import { verifyUserPassword } from "@/lib/users";
 
 const credentialsSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string().min(8)
 });
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   pages: {
-    signIn: "/sign-in",
+    signIn: "/login"
   },
   providers: [
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        password: { label: "Password", type: "password" }
       },
-      authorize(credentials) {
+      async authorize(credentials) {
         const parsed = credentialsSchema.safeParse(credentials);
         if (!parsed.success) {
           return null;
         }
 
-        const user = verifyUserPassword(parsed.data.email, parsed.data.password);
-        if (!user) return null;
-
+        const user = await verifyUserPassword(parsed.data.email, parsed.data.password);
         return user;
-      },
-    }),
+      }
+    })
   ],
   callbacks: {
     jwt({ token, user }) {
@@ -45,8 +43,8 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub;
       }
       return session;
-    },
-  },
+    }
+  }
 };
 
 export const auth = () => getServerSession(authOptions);
