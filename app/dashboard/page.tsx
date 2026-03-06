@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { DashboardClient } from "@/components/dashboard-client";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -10,10 +11,11 @@ export default async function DashboardPage() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-6 py-12">
-      <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
-        <p className="mt-2 text-slate-600">Welcome, {session.user.email}. Upload and analysis UI lands in Phase 2/3.</p>
+      <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h1 className="text-2xl font-semibold text-slate-900">SOC Dashboard</h1>
+        <p className="mt-1 text-sm text-slate-600">Signed in as {session.user.email}</p>
       </div>
+      <DashboardClient />
     </main>
   );
 }
