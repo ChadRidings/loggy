@@ -36,14 +36,6 @@ async function uploadFile(formData: FormData): Promise<{ uploadId: string; statu
   };
 }
 
-const uploadStatusBadgeStates = {
-  completed: { className: "bg-lime-300 text-slate-900" },
-  partial_success: { className: "bg-amber-100 text-slate-900" },
-  failed: { className: "bg-red-100 text-slate-900" },
-  processing: { className: "bg-blue-100 text-slate-900" },
-  queued: { className: "bg-slate-100 text-slate-900" }
-};
-
 export function DashboardClient() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -176,7 +168,7 @@ export function DashboardClient() {
                       {(upload.raw_size_bytes / 1024).toFixed(1)} KB
                     </p>
                   </div>
-                  <StatusBadge status={upload.status} states={uploadStatusBadgeStates} />
+                  <StatusBadge status={upload.status} />
                 </div>
 
                 {upload.failure_reason ? (

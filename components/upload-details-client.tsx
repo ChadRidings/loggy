@@ -4,12 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUploadUiStore } from "@/store/upload-ui-store";
 import { StatusBadge } from "@/components/status-badge";
-import type {
-  AnomalyRecord,
-  EventRecord,
-  TimelineRecord,
-  UploadRecord,
-} from "@/types/loggy";
+import type { AnomalyRecord, EventRecord, TimelineRecord, UploadRecord } from "@/types/loggy";
 
 async function fetchUpload(uploadId: string): Promise<UploadRecord> {
   const response = await fetch(`/api/uploads/${uploadId}`, { cache: "no-store" });
@@ -56,14 +51,6 @@ async function fetchEvents(args: {
   if (!response.ok) throw new Error("Failed to load events");
   return (await response.json()) as { events: EventRecord[]; nextCursor: string | null };
 }
-
-const uploadStatusBadgeStates = {
-  completed: { className: "bg-emerald-100 text-slate-900" },
-  partial_success: { className: "bg-amber-100 text-slate-900" },
-  failed: { className: "bg-red-100 text-slate-900" },
-  processing: { className: "bg-blue-100 text-slate-900" },
-  queued: { className: "bg-slate-100 text-slate-900" }
-};
 
 export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   const { filters, setFilter, resetFilters, selectedAnomalyId, setSelectedAnomalyId } =
@@ -163,10 +150,10 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
+      <section>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">
+            <h1 className="text-2xl font-semibold text-white">
               {uploadQuery.data?.filename ?? "Upload details"}
             </h1>
             <p className="mt-1 text-sm">
@@ -174,14 +161,11 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
               {uploadQuery.data ? new Date(uploadQuery.data.uploaded_at).toLocaleString() : "-"}
             </p>
             {isProcessing ? (
-              <p className="mt-1 text-xs">
-                Auto-refreshing timeline, events, and anomalies...
-              </p>
+              <p className="mt-1 text-xs">Auto-refreshing timeline, events, and anomalies...</p>
             ) : null}
           </div>
           <StatusBadge
             status={uploadQuery.data?.status ?? "queued"}
-            states={uploadStatusBadgeStates}
             fallback={{ className: "bg-slate-100 text-slate-900", label: "loading" }}
           />
         </div>
@@ -231,9 +215,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
                 </p>
               </li>
             ))}
-            {anomalyQuery.data?.length === 0 ? (
-              <li>No anomalies detected yet.</li>
-            ) : null}
+            {anomalyQuery.data?.length === 0 ? <li>No anomalies detected yet.</li> : null}
           </ul>
         </div>
       </section>
@@ -321,9 +303,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
         {eventsQuery.isLoading && eventRows.length === 0 ? (
           <p className="mt-3 text-sm">Loading events...</p>
         ) : null}
-        {eventsQuery.isError ? (
-          <p className="mt-3 text-sm">Failed to load events.</p>
-        ) : null}
+        {eventsQuery.isError ? <p className="mt-3 text-sm">Failed to load events.</p> : null}
         {!eventsQuery.isLoading && eventRows.length === 0 ? (
           <p className="mt-3 text-sm">No events found.</p>
         ) : null}
