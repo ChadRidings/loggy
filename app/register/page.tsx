@@ -1,8 +1,11 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import type { ComponentProps } from "react";
+import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+
+type FormSubmitHandler = NonNullable<ComponentProps<"form">["onSubmit"]>;
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -12,7 +15,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+  const onSubmit: FormSubmitHandler = async (event) => {
     event.preventDefault();
     setLoading(true);
     setError(null);
@@ -45,7 +48,7 @@ export default function RegisterPage() {
     }
 
     router.push("/dashboard");
-  }
+  };
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md items-center px-6">
