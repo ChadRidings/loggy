@@ -1,0 +1,4 @@
+2026-03-05T09:00:00Z,10.2.1.5,https://news.example,ALLOW,200,alice@corp,GET,4587,Mozilla/5.0
+2026-03-05T09:01:11Z,10.2.1.5,https://secure.example/login,ALLOW,200,alice@corp,POST,1512,Mozilla/5.0
+2026-03-05T09:02:30Z,10.2.1.5,https://unknown-malicious.test,DENY,403,alice@corp,GET,300,Mozilla/5.0
+2026-03-05T09:03:01Z,10.2.1.8,https://intranet.example,ALLOW,200,bob@corp,GET,2211,Chrome/124

@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: loggy-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: loggy
+      POSTGRES_USER: loggy
+      POSTGRES_PASSWORD: loggy
+    ports:
+      - "5432:5432"
+    volumes:
+      - loggy_db_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: loggy-web
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: change-me-to-a-long-random-string
+      DATABASE_URL: postgres://loggy:loggy@db:5432/loggy
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  loggy_db_data:
