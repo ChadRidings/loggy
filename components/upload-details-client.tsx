@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Label, Separator } from "radix-ui";
+import { Form, Separator } from "radix-ui";
 import { useUploadUiStore } from "@/store/upload-ui-store";
 import { StatusBadge } from "@/components/status-badge";
 import { PaginationControls } from "@/components/pagination-controls";
@@ -229,18 +229,18 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           />
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h2 className="text-lg font-semibold text-slate-900">Anomalies</h2>
+        <div className="rounded-2xl border border-(--border) bg-(--background) p-6">
+          <h2 className="text-lg font-semibold text-white">Anomalies</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {visibleAnomalyItems.map((anomaly) => (
               <li
                 key={anomaly.id}
-                className={`cursor-pointer rounded-lg border p-3 ${selectedAnomalyId === anomaly.id ? "border-slate-900" : "border-slate-200"}`}
+                className={`cursor-pointer rounded-lg border p-3 ${selectedAnomalyId === anomaly.id ? "border-(--accent)" : "border-(--border)"}`}
                 onClick={() => setSelectedAnomalyId(anomaly.id)}
               >
                 <div className="flex items-center justify-between gap-2">
                   <p className="font-medium">{anomaly.type}</p>
-                  <span className="rounded-full bg-slate-100 px-2 py-1 text-xs">
+                  <span className="rounded-full bg-(--accent) px-2 py-1 text-xs text-white">
                     {Number(anomaly.confidence_score).toFixed(2)} / 10
                   </span>
                 </div>
@@ -263,54 +263,62 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6">
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="text-sm">
-            <Label.Root htmlFor="filter-src-ip">Source IP</Label.Root>
-            <input
-              id="filter-src-ip"
-              className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1 text-slate-200"
-              value={filters.srcIp}
-              onChange={(event) => setFilter("srcIp", event.target.value)}
-            />
-          </div>
-          <div className="text-sm">
-            <Label.Root htmlFor="filter-domain">Domain</Label.Root>
-            <input
-              id="filter-domain"
-              className="mt-1 w-44 rounded-lg border border-slate-300 px-2 py-1 text-slate-200"
-              value={filters.domain}
-              onChange={(event) => setFilter("domain", event.target.value)}
-            />
-          </div>
-          <div className="text-sm">
-            <Label.Root htmlFor="filter-action">Action</Label.Root>
-            <input
-              id="filter-action"
-              className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1 text-slate-200"
-              value={filters.action}
-              onChange={(event) => setFilter("action", event.target.value)}
-            />
-          </div>
-          <div className="text-sm">
-            <Label.Root htmlFor="filter-status">Status</Label.Root>
-            <input
-              id="filter-status"
-              className="mt-1 w-24 rounded-lg border border-slate-300 px-2 py-1 text-slate-200"
-              value={filters.statusCode}
-              onChange={(event) => setFilter("statusCode", event.target.value)}
-            />
-          </div>
+      <section className="rounded-2xl border border-(--border) bg-(--background) p-6">
+        <Form.Root className="flex flex-wrap items-end gap-3">
+          <Form.Field name="src_ip" className="text-sm">
+            <Form.Label htmlFor="filter-src-ip">Source IP</Form.Label>
+            <Form.Control asChild>
+              <input
+                id="filter-src-ip"
+                className="mt-1 w-36 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                value={filters.srcIp}
+                onChange={(event) => setFilter("srcIp", event.target.value)}
+              />
+            </Form.Control>
+          </Form.Field>
+          <Form.Field name="domain" className="text-sm">
+            <Form.Label htmlFor="filter-domain">Domain</Form.Label>
+            <Form.Control asChild>
+              <input
+                id="filter-domain"
+                className="mt-1 w-44 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                value={filters.domain}
+                onChange={(event) => setFilter("domain", event.target.value)}
+              />
+            </Form.Control>
+          </Form.Field>
+          <Form.Field name="action" className="text-sm">
+            <Form.Label htmlFor="filter-action">Action</Form.Label>
+            <Form.Control asChild>
+              <input
+                id="filter-action"
+                className="mt-1 w-32 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                value={filters.action}
+                onChange={(event) => setFilter("action", event.target.value)}
+              />
+            </Form.Control>
+          </Form.Field>
+          <Form.Field name="status_code" className="text-sm">
+            <Form.Label htmlFor="filter-status">Status</Form.Label>
+            <Form.Control asChild>
+              <input
+                id="filter-status"
+                className="mt-1 w-24 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                value={filters.statusCode}
+                onChange={(event) => setFilter("statusCode", event.target.value)}
+              />
+            </Form.Control>
+          </Form.Field>
           <button
             type="button"
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            className="rounded-lg border border-(--border) px-3 py-2 text-sm"
             onClick={() => void eventsQuery.refetch()}
           >
             Apply Filters
           </button>
           <button
             type="button"
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            className="rounded-lg border border-(--border) px-3 py-2 text-sm"
             onClick={() => {
               resetFilters();
               void eventsQuery.refetch();
@@ -318,12 +326,12 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           >
             Reset
           </button>
-        </div>
+        </Form.Root>
 
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 overflow-x-auto linear-bg">
           <table className="w-full min-w-[720px] border-collapse text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-left">
+              <tr className="border-b border-(--border) text-left">
                 <th className="pb-2">Timestamp</th>
                 <th className="pb-2">IP</th>
                 <th className="pb-2">Domain</th>
@@ -334,7 +342,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
             </thead>
             <tbody>
               {eventRows.map((event) => (
-                <tr key={event.id} className="border-b border-slate-100">
+                <tr key={event.id} className="border-b border-(--border)">
                   <td className="py-2 pr-2">{new Date(event.timestamp).toLocaleString()}</td>
                   <td className="py-2 pr-2">{event.src_ip ?? "-"}</td>
                   <td className="py-2 pr-2">{event.domain ?? "-"}</td>
@@ -358,7 +366,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
         {nextCursor ? (
           <button
             type="button"
-            className="mt-4 rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            className="mt-4 rounded-lg border border-(--border) px-3 py-2 text-sm"
             onClick={() => void loadMoreEvents()}
             disabled={loadingMore}
           >

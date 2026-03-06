@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Form } from "radix-ui";
 
 type FormSubmitHandler = NonNullable<ComponentProps<"form">["onSubmit"]>;
 
@@ -52,33 +53,37 @@ export default function RegisterPage() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md items-center px-6">
-      <form onSubmit={onSubmit} className="w-full rounded-2xl border border-slate-200 bg-white p-8">
+      <Form.Root onSubmit={onSubmit} className="w-full rounded-2xl border border-slate-200 bg-white p-8">
         <h1 className="text-2xl font-semibold text-slate-900">Create Account</h1>
         <p className="mt-2 text-sm">Register for Loggy.</p>
 
         <div className="mt-6 space-y-4">
-          <label className="block text-sm font-medium">
-            Email
-            <input
-              type="email"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-200"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-            />
-          </label>
+          <Form.Field name="email" className="block text-sm font-medium">
+            <Form.Label>Email</Form.Label>
+            <Form.Control asChild>
+              <input
+                type="email"
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-200"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
+            </Form.Control>
+          </Form.Field>
 
-          <label className="block text-sm font-medium">
-            Password
-            <input
-              type="password"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-200"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              minLength={8}
-              required
-            />
-          </label>
+          <Form.Field name="password" className="block text-sm font-medium">
+            <Form.Label>Password</Form.Label>
+            <Form.Control asChild>
+              <input
+                type="password"
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-200"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                minLength={8}
+                required
+              />
+            </Form.Control>
+          </Form.Field>
         </div>
 
         {error ? <p className="mt-4 text-sm">{error}</p> : null}
@@ -97,7 +102,7 @@ export default function RegisterPage() {
             Login
           </a>
         </p>
-      </form>
+      </Form.Root>
     </main>
   );
 }

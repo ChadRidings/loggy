@@ -13,7 +13,7 @@ export function PaginationControls({
   totalPages,
   onPageChange,
   ariaLabel,
-  className
+  className,
 }: PaginationControlsProps) {
   if (totalPages <= 1) {
     return null;
@@ -25,7 +25,7 @@ export function PaginationControls({
     <div className={className ?? "mt-4 flex items-center justify-between text-xs"}>
       <button
         type="button"
-        className="rounded border border-slate-300 px-2 py-1 disabled:opacity-50"
+        className="rounded border border-(--border) px-2 py-1 text-slate-300 hover:text-(--accent) hover:border-(--accent) transition-colors duration-300 ease-in-out disabled:opacity-50 disabled:hover:text-slate-300 disabled:hover:border-(--border)"
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1}
       >
@@ -46,7 +46,7 @@ export function PaginationControls({
           <ToggleGroup.Item
             key={page}
             value={String(page)}
-            className="rounded border border-slate-300 px-2 py-1 data-[state=on]:bg-slate-900 data-[state=on]:text-white"
+            className="rounded border border-slate-300 px-2 py-1 data-[state=on]:bg-slate-900 data-[state=on]:text-(--accent) data-[state=on]:border-(--accent) disabled:opacity-50"
             aria-label={`Go to page ${page}`}
           >
             {page}
@@ -55,7 +55,7 @@ export function PaginationControls({
       </ToggleGroup.Root>
       <button
         type="button"
-        className="rounded border border-slate-300 px-2 py-1 disabled:opacity-50"
+        className="rounded border border-(--border) px-2 py-1 text-slate-300 hover:text-(--accent) hover:border-(--accent) transition-colors duration-300 ease-in-out disabled:opacity-50 disabled:hover:text-slate-300 disabled:hover:border-(--border)"
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage === totalPages}
       >

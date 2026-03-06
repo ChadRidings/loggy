@@ -3,9 +3,7 @@
 :root {
   --background: #081722;
   --textmain: #a1bbcf;
-  --card: var(--color-slate-900);
-  --card-foreground: var(--color-slate-200);
-  --muted: var(--color-slate-400);
+  --white: #ffffff;
   --border: #2d3a43;
   --accent: #61d7e6;
 }
@@ -19,6 +17,16 @@ body {
 }
 
 a {
-  color: inherit;
+  color: var(--accent);
   text-decoration: none;
+  transition: color 0.3s ease-in-out;
+}
+
+a:hover {
+  color: var(--white);
+}
+
+.linear-bg {
+  background-color: var(--background);
+  background: linear-gradient(to bottom, #081722 0%, #081722 62%, #0a1823 100%);
 }
