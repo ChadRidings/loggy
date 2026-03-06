@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Label, Separator, ToggleGroup } from "radix-ui";
 import { useUploadUiStore } from "@/store/upload-ui-store";
 import { StatusBadge } from "@/components/status-badge";
 import type { AnomalyRecord, EventRecord, TimelineRecord, UploadRecord } from "@/types/loggy";
@@ -61,6 +62,8 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   const [eventRows, setEventRows] = useState<EventRecord[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [timelinePage, setTimelinePage] = useState(1);
+  const [anomalyPage, setAnomalyPage] = useState(1);
 
   const uploadQuery = useQuery({
     queryKey: ["upload", uploadId],
@@ -132,6 +135,14 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
     setNextCursor(eventsQuery.data.nextCursor);
   }, [eventsQuery.data]);
 
+  useEffect(() => {
+    setTimelinePage(1);
+  }, [timelineQuery.data]);
+
+  useEffect(() => {
+    setAnomalyPage(1);
+  }, [anomalyQuery.data]);
+
   async function loadMoreEvents() {
     if (!nextCursor || loadingMore) {
       return;
@@ -147,6 +158,20 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
       setLoadingMore(false);
     }
   }
+
+  const pageSize = 5;
+  const timelineItems = timelineQuery.data ?? [];
+  const timelineTotalPages = Math.max(1, Math.ceil(timelineItems.length / pageSize));
+  const timelinePages = Array.from({ length: timelineTotalPages }, (_, index) => index + 1);
+  const visibleTimelineItems = timelineItems.slice(
+    (timelinePage - 1) * pageSize,
+    timelinePage * pageSize
+  );
+
+  const anomalyItems = anomalyQuery.data ?? [];
+  const anomalyTotalPages = Math.max(1, Math.ceil(anomalyItems.length / pageSize));
+  const anomalyPages = Array.from({ length: anomalyTotalPages }, (_, index) => index + 1);
+  const visibleAnomalyItems = anomalyItems.slice((anomalyPage - 1) * pageSize, anomalyPage * pageSize);
 
   return (
     <div className="space-y-6">
@@ -174,11 +199,13 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
         ) : null}
       </section>
 
+      <Separator.Root className="h-px bg-slate-700/40" />
+
       <section className="grid gap-6 md:grid-cols-2">
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="text-lg font-semibold text-slate-900">Timeline</h2>
           <ul className="mt-4 space-y-2 text-sm">
-            {(timelineQuery.data ?? []).map((bucket) => (
+            {visibleTimelineItems.map((bucket) => (
               <li key={bucket.id} className="rounded-lg border border-slate-200 p-3">
                 <p className="font-medium">
                   {new Date(bucket.bucket_start).toLocaleTimeString()} -{" "}
@@ -191,12 +218,54 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
               </li>
             ))}
           </ul>
+          {timelineItems.length > pageSize ? (
+            <div className="mt-4 flex items-center justify-between text-xs">
+              <button
+                type="button"
+                className="rounded border border-slate-300 px-2 py-1 disabled:opacity-50"
+                onClick={() => setTimelinePage((page) => Math.max(1, page - 1))}
+                disabled={timelinePage === 1}
+              >
+                Previous
+              </button>
+              <ToggleGroup.Root
+                type="single"
+                value={String(timelinePage)}
+                onValueChange={(value) => {
+                  if (value) {
+                    setTimelinePage(Number(value));
+                  }
+                }}
+                aria-label="Timeline pagination"
+                className="flex items-center gap-1"
+              >
+                {timelinePages.map((page) => (
+                  <ToggleGroup.Item
+                    key={page}
+                    value={String(page)}
+                    className="rounded border border-slate-300 px-2 py-1 data-[state=on]:bg-slate-900 data-[state=on]:text-white"
+                    aria-label={`Go to timeline page ${page}`}
+                  >
+                    {page}
+                  </ToggleGroup.Item>
+                ))}
+              </ToggleGroup.Root>
+              <button
+                type="button"
+                className="rounded border border-slate-300 px-2 py-1 disabled:opacity-50"
+                onClick={() => setTimelinePage((page) => Math.min(timelineTotalPages, page + 1))}
+                disabled={timelinePage === timelineTotalPages}
+              >
+                Next
+              </button>
+            </div>
+          ) : null}
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="text-lg font-semibold text-slate-900">Anomalies</h2>
           <ul className="mt-4 space-y-2 text-sm">
-            {(anomalyQuery.data ?? []).map((anomaly) => (
+            {visibleAnomalyItems.map((anomaly) => (
               <li
                 key={anomaly.id}
                 className={`cursor-pointer rounded-lg border p-3 ${selectedAnomalyId === anomaly.id ? "border-slate-900" : "border-slate-200"}`}
@@ -215,45 +284,91 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
                 </p>
               </li>
             ))}
-            {anomalyQuery.data?.length === 0 ? <li>No anomalies detected yet.</li> : null}
+            {anomalyItems.length === 0 ? <li>No anomalies detected yet.</li> : null}
           </ul>
+          {anomalyItems.length > pageSize ? (
+            <div className="mt-4 flex items-center justify-between text-xs">
+              <button
+                type="button"
+                className="rounded border border-slate-300 px-2 py-1 disabled:opacity-50"
+                onClick={() => setAnomalyPage((page) => Math.max(1, page - 1))}
+                disabled={anomalyPage === 1}
+              >
+                Previous
+              </button>
+              <ToggleGroup.Root
+                type="single"
+                value={String(anomalyPage)}
+                onValueChange={(value) => {
+                  if (value) {
+                    setAnomalyPage(Number(value));
+                  }
+                }}
+                aria-label="Anomalies pagination"
+                className="flex items-center gap-1"
+              >
+                {anomalyPages.map((page) => (
+                  <ToggleGroup.Item
+                    key={page}
+                    value={String(page)}
+                    className="rounded border border-slate-300 px-2 py-1 data-[state=on]:bg-slate-900 data-[state=on]:text-white"
+                    aria-label={`Go to anomalies page ${page}`}
+                  >
+                    {page}
+                  </ToggleGroup.Item>
+                ))}
+              </ToggleGroup.Root>
+              <button
+                type="button"
+                className="rounded border border-slate-300 px-2 py-1 disabled:opacity-50"
+                onClick={() => setAnomalyPage((page) => Math.min(anomalyTotalPages, page + 1))}
+                disabled={anomalyPage === anomalyTotalPages}
+              >
+                Next
+              </button>
+            </div>
+          ) : null}
         </div>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <div className="flex flex-wrap items-end gap-3">
-          <label className="text-sm">
-            Source IP
+          <div className="text-sm">
+            <Label.Root htmlFor="filter-src-ip">Source IP</Label.Root>
             <input
+              id="filter-src-ip"
               className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1 text-slate-200"
               value={filters.srcIp}
               onChange={(event) => setFilter("srcIp", event.target.value)}
             />
-          </label>
-          <label className="text-sm">
-            Domain
+          </div>
+          <div className="text-sm">
+            <Label.Root htmlFor="filter-domain">Domain</Label.Root>
             <input
+              id="filter-domain"
               className="mt-1 w-44 rounded-lg border border-slate-300 px-2 py-1 text-slate-200"
               value={filters.domain}
               onChange={(event) => setFilter("domain", event.target.value)}
             />
-          </label>
-          <label className="text-sm">
-            Action
+          </div>
+          <div className="text-sm">
+            <Label.Root htmlFor="filter-action">Action</Label.Root>
             <input
+              id="filter-action"
               className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1 text-slate-200"
               value={filters.action}
               onChange={(event) => setFilter("action", event.target.value)}
             />
-          </label>
-          <label className="text-sm">
-            Status
+          </div>
+          <div className="text-sm">
+            <Label.Root htmlFor="filter-status">Status</Label.Root>
             <input
+              id="filter-status"
               className="mt-1 w-24 rounded-lg border border-slate-300 px-2 py-1 text-slate-200"
               value={filters.statusCode}
               onChange={(event) => setFilter("statusCode", event.target.value)}
             />
-          </label>
+          </div>
           <button
             type="button"
             className="rounded-lg border border-slate-300 px-3 py-2 text-sm"

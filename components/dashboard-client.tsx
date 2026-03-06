@@ -176,7 +176,7 @@ export function DashboardClient() {
                 ) : null}
 
                 <Link href={`/uploads/${upload.id}`} className="mt-3 inline-block">
-                  <span className="text-sm font-medium text-(--accent) hover:text-(--textmain)/80">
+                  <span className="text-sm font-medium text-(--accent) hover:text-white transition-colors duration-300 ease-in-out">
                     View Analysis
                   </span>
                 </Link>
