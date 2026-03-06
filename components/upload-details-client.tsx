@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Label, Separator, ToggleGroup } from "radix-ui";
+import { Label, Separator } from "radix-ui";
 import { useUploadUiStore } from "@/store/upload-ui-store";
 import { StatusBadge } from "@/components/status-badge";
+import { PaginationControls } from "@/components/pagination-controls";
 import type { AnomalyRecord, EventRecord, TimelineRecord, UploadRecord } from "@/types/loggy";
 
 async function fetchUpload(uploadId: string): Promise<UploadRecord> {
@@ -162,7 +163,6 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   const pageSize = 5;
   const timelineItems = timelineQuery.data ?? [];
   const timelineTotalPages = Math.max(1, Math.ceil(timelineItems.length / pageSize));
-  const timelinePages = Array.from({ length: timelineTotalPages }, (_, index) => index + 1);
   const visibleTimelineItems = timelineItems.slice(
     (timelinePage - 1) * pageSize,
     timelinePage * pageSize
@@ -170,8 +170,10 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
 
   const anomalyItems = anomalyQuery.data ?? [];
   const anomalyTotalPages = Math.max(1, Math.ceil(anomalyItems.length / pageSize));
-  const anomalyPages = Array.from({ length: anomalyTotalPages }, (_, index) => index + 1);
-  const visibleAnomalyItems = anomalyItems.slice((anomalyPage - 1) * pageSize, anomalyPage * pageSize);
+  const visibleAnomalyItems = anomalyItems.slice(
+    (anomalyPage - 1) * pageSize,
+    anomalyPage * pageSize
+  );
 
   return (
     <div className="space-y-6">
@@ -202,11 +204,11 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
       <Separator.Root className="h-px bg-slate-700/40" />
 
       <section className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h2 className="text-lg font-semibold text-slate-900">Timeline</h2>
+        <div className="rounded-2xl border border-(--border) bg-(--background) p-6">
+          <h2 className="text-lg font-semibold text-white">Timeline</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {visibleTimelineItems.map((bucket) => (
-              <li key={bucket.id} className="rounded-lg border border-slate-200 p-3">
+              <li key={bucket.id} className="rounded-lg border border-(--border) p-3">
                 <p className="font-medium">
                   {new Date(bucket.bucket_start).toLocaleTimeString()} -{" "}
                   {new Date(bucket.bucket_end).toLocaleTimeString()}
@@ -218,48 +220,13 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
               </li>
             ))}
           </ul>
-          {timelineItems.length > pageSize ? (
-            <div className="mt-4 flex items-center justify-between text-xs">
-              <button
-                type="button"
-                className="rounded border border-slate-300 px-2 py-1 disabled:opacity-50"
-                onClick={() => setTimelinePage((page) => Math.max(1, page - 1))}
-                disabled={timelinePage === 1}
-              >
-                Previous
-              </button>
-              <ToggleGroup.Root
-                type="single"
-                value={String(timelinePage)}
-                onValueChange={(value) => {
-                  if (value) {
-                    setTimelinePage(Number(value));
-                  }
-                }}
-                aria-label="Timeline pagination"
-                className="flex items-center gap-1"
-              >
-                {timelinePages.map((page) => (
-                  <ToggleGroup.Item
-                    key={page}
-                    value={String(page)}
-                    className="rounded border border-slate-300 px-2 py-1 data-[state=on]:bg-slate-900 data-[state=on]:text-white"
-                    aria-label={`Go to timeline page ${page}`}
-                  >
-                    {page}
-                  </ToggleGroup.Item>
-                ))}
-              </ToggleGroup.Root>
-              <button
-                type="button"
-                className="rounded border border-slate-300 px-2 py-1 disabled:opacity-50"
-                onClick={() => setTimelinePage((page) => Math.min(timelineTotalPages, page + 1))}
-                disabled={timelinePage === timelineTotalPages}
-              >
-                Next
-              </button>
-            </div>
-          ) : null}
+          <PaginationControls
+            currentPage={timelinePage}
+            totalPages={timelineTotalPages}
+            onPageChange={setTimelinePage}
+            ariaLabel="Timeline pagination"
+            className="mt-4 flex items-center justify-between text-xs"
+          />
         </div>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6">
@@ -286,48 +253,13 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
             ))}
             {anomalyItems.length === 0 ? <li>No anomalies detected yet.</li> : null}
           </ul>
-          {anomalyItems.length > pageSize ? (
-            <div className="mt-4 flex items-center justify-between text-xs">
-              <button
-                type="button"
-                className="rounded border border-slate-300 px-2 py-1 disabled:opacity-50"
-                onClick={() => setAnomalyPage((page) => Math.max(1, page - 1))}
-                disabled={anomalyPage === 1}
-              >
-                Previous
-              </button>
-              <ToggleGroup.Root
-                type="single"
-                value={String(anomalyPage)}
-                onValueChange={(value) => {
-                  if (value) {
-                    setAnomalyPage(Number(value));
-                  }
-                }}
-                aria-label="Anomalies pagination"
-                className="flex items-center gap-1"
-              >
-                {anomalyPages.map((page) => (
-                  <ToggleGroup.Item
-                    key={page}
-                    value={String(page)}
-                    className="rounded border border-slate-300 px-2 py-1 data-[state=on]:bg-slate-900 data-[state=on]:text-white"
-                    aria-label={`Go to anomalies page ${page}`}
-                  >
-                    {page}
-                  </ToggleGroup.Item>
-                ))}
-              </ToggleGroup.Root>
-              <button
-                type="button"
-                className="rounded border border-slate-300 px-2 py-1 disabled:opacity-50"
-                onClick={() => setAnomalyPage((page) => Math.min(anomalyTotalPages, page + 1))}
-                disabled={anomalyPage === anomalyTotalPages}
-              >
-                Next
-              </button>
-            </div>
-          ) : null}
+          <PaginationControls
+            currentPage={anomalyPage}
+            totalPages={anomalyTotalPages}
+            onPageChange={setAnomalyPage}
+            ariaLabel="Anomalies pagination"
+            className="mt-4 flex items-center justify-between text-xs"
+          />
         </div>
       </section>
 
