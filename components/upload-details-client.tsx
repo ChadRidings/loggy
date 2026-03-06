@@ -91,11 +91,11 @@ async function fetchEvents(args: {
 }
 
 function statusBadgeClass(status: string): string {
-  if (status === "completed") return "bg-emerald-100 text-emerald-800";
-  if (status === "partial_success") return "bg-amber-100 text-amber-800";
-  if (status === "failed") return "bg-red-100 text-red-700";
-  if (status === "processing") return "bg-blue-100 text-blue-700";
-  return "bg-slate-100 text-slate-700";
+  if (status === "completed") return "bg-emerald-100";
+  if (status === "partial_success") return "bg-amber-100";
+  if (status === "failed") return "bg-red-100";
+  if (status === "processing") return "bg-blue-100";
+  return "bg-slate-100";
 }
 
 export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
@@ -202,12 +202,12 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
             <h1 className="text-2xl font-semibold text-slate-900">
               {uploadQuery.data?.filename ?? "Upload details"}
             </h1>
-            <p className="mt-1 text-sm text-slate-600">
+            <p className="mt-1 text-sm">
               Uploaded{" "}
               {uploadQuery.data ? new Date(uploadQuery.data.uploaded_at).toLocaleString() : "-"}
             </p>
             {isProcessing ? (
-              <p className="mt-1 text-xs text-blue-700">
+              <p className="mt-1 text-xs">
                 Auto-refreshing timeline, events, and anomalies...
               </p>
             ) : null}
@@ -219,7 +219,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           </span>
         </div>
         {uploadQuery.data?.failure_reason ? (
-          <p className="mt-3 text-sm text-red-600">{uploadQuery.data.failure_reason}</p>
+          <p className="mt-3 text-sm">{uploadQuery.data.failure_reason}</p>
         ) : null}
       </section>
 
@@ -229,11 +229,11 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           <ul className="mt-4 space-y-2 text-sm">
             {(timelineQuery.data ?? []).map((bucket) => (
               <li key={bucket.id} className="rounded-lg border border-slate-200 p-3">
-                <p className="font-medium text-slate-900">
+                <p className="font-medium">
                   {new Date(bucket.bucket_start).toLocaleTimeString()} -{" "}
                   {new Date(bucket.bucket_end).toLocaleTimeString()}
                 </p>
-                <p className="text-slate-600">
+                <p>
                   Events: {bucket.event_count} · Blocked: {bucket.blocked_count} · Top IP:{" "}
                   {bucket.top_ip ?? "-"}
                 </p>
@@ -252,20 +252,20 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
                 onClick={() => setSelectedAnomalyId(anomaly.id)}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <p className="font-medium text-slate-900">{anomaly.type}</p>
-                  <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-700">
+                  <p className="font-medium">{anomaly.type}</p>
+                  <span className="rounded-full bg-slate-100 px-2 py-1 text-xs">
                     {Number(anomaly.confidence_score).toFixed(2)} / 10
                   </span>
                 </div>
-                <p className="mt-1 text-slate-600">{anomaly.explanation}</p>
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1">{anomaly.explanation}</p>
+                <p className="mt-1 text-xs">
                   Source: {anomaly.detection_source}
                   {anomaly.llm_reasoning_summary ? ` · ${anomaly.llm_reasoning_summary}` : ""}
                 </p>
               </li>
             ))}
             {anomalyQuery.data?.length === 0 ? (
-              <li className="text-slate-600">No anomalies detected yet.</li>
+              <li>No anomalies detected yet.</li>
             ) : null}
           </ul>
         </div>
@@ -276,7 +276,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           <label className="text-sm">
             Source IP
             <input
-              className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1"
+              className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1 text-slate-200"
               value={filters.srcIp}
               onChange={(event) => setFilter("srcIp", event.target.value)}
             />
@@ -284,7 +284,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           <label className="text-sm">
             Domain
             <input
-              className="mt-1 w-44 rounded-lg border border-slate-300 px-2 py-1"
+              className="mt-1 w-44 rounded-lg border border-slate-300 px-2 py-1 text-slate-200"
               value={filters.domain}
               onChange={(event) => setFilter("domain", event.target.value)}
             />
@@ -292,7 +292,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           <label className="text-sm">
             Action
             <input
-              className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1"
+              className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1 text-slate-200"
               value={filters.action}
               onChange={(event) => setFilter("action", event.target.value)}
             />
@@ -300,7 +300,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           <label className="text-sm">
             Status
             <input
-              className="mt-1 w-24 rounded-lg border border-slate-300 px-2 py-1"
+              className="mt-1 w-24 rounded-lg border border-slate-300 px-2 py-1 text-slate-200"
               value={filters.statusCode}
               onChange={(event) => setFilter("statusCode", event.target.value)}
             />
@@ -327,7 +327,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[720px] border-collapse text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-left text-slate-600">
+              <tr className="border-b border-slate-200 text-left">
                 <th className="pb-2">Timestamp</th>
                 <th className="pb-2">IP</th>
                 <th className="pb-2">Domain</th>
@@ -352,13 +352,13 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
         </div>
 
         {eventsQuery.isLoading && eventRows.length === 0 ? (
-          <p className="mt-3 text-sm text-slate-600">Loading events...</p>
+          <p className="mt-3 text-sm">Loading events...</p>
         ) : null}
         {eventsQuery.isError ? (
-          <p className="mt-3 text-sm text-red-600">Failed to load events.</p>
+          <p className="mt-3 text-sm">Failed to load events.</p>
         ) : null}
         {!eventsQuery.isLoading && eventRows.length === 0 ? (
-          <p className="mt-3 text-sm text-slate-600">No events found.</p>
+          <p className="mt-3 text-sm">No events found.</p>
         ) : null}
 
         {nextCursor ? (

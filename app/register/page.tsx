@@ -54,25 +54,25 @@ export default function RegisterPage() {
     <main className="mx-auto flex min-h-screen w-full max-w-md items-center px-6">
       <form onSubmit={onSubmit} className="w-full rounded-2xl border border-slate-200 bg-white p-8">
         <h1 className="text-2xl font-semibold text-slate-900">Create Account</h1>
-        <p className="mt-2 text-sm text-slate-600">Register for Loggy.</p>
+        <p className="mt-2 text-sm">Register for Loggy.</p>
 
         <div className="mt-6 space-y-4">
-          <label className="block text-sm font-medium text-slate-700">
+          <label className="block text-sm font-medium">
             Email
             <input
               type="email"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-200"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
             />
           </label>
 
-          <label className="block text-sm font-medium text-slate-700">
+          <label className="block text-sm font-medium">
             Password
             <input
               type="password"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-200"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               minLength={8}
@@ -81,19 +81,19 @@ export default function RegisterPage() {
           </label>
         </div>
 
-        {error ? <p className="mt-4 text-sm text-red-600">{error}</p> : null}
+        {error ? <p className="mt-4 text-sm">{error}</p> : null}
 
         <button
           type="submit"
-          className="mt-6 w-full rounded-lg bg-slate-900 px-4 py-2 font-medium text-white disabled:opacity-60"
+          className="mt-6 w-full rounded-lg bg-slate-900 px-4 py-2 font-medium disabled:opacity-60"
           disabled={loading}
         >
           {loading ? "Creating account..." : "Register"}
         </button>
 
-        <p className="mt-4 text-sm text-slate-600">
+        <p className="mt-4 text-sm">
           Already have an account?{" "}
-          <a href="/login" className="font-medium text-slate-900">
+          <a href="/login" className="font-medium">
             Login
           </a>
         </p>
