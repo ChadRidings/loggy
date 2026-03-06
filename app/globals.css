@@ -12,7 +12,16 @@ body {
   margin: 0;
   min-height: 100vh;
   background-color: var(--background);
-  background: linear-gradient(to bottom, #081722 0%, #081722 62%, #0a1823 100%);
+  background-image:
+    linear-gradient(123deg, rgb(92 74 162 / 22%) 0%, transparent 24%),
+    linear-gradient(108deg, transparent 36%, rgb(167 83 176 / 14%) 52%, transparent 72%),
+    linear-gradient(245deg, transparent 64%, rgb(90 71 154 / 18%) 100%),
+    radial-gradient(1100px 600px at 50% -12%, rgb(63 127 185 / 20%) 0%, transparent 62%),
+    radial-gradient(900px 500px at 50% 48%, rgb(94 72 145 / 12%) 0%, transparent 68%),
+    linear-gradient(to bottom, #081722 0%, #081722 65%, #091823 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
   color: var(--textmain);
 }
 
