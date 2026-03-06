@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 
-export async function requireApiUser() {
+type RequireUserResult =
+  | { userId: string; response: null }
+  | { userId: null; response: NextResponse<{ error: string }> };
+
+export async function requireApiUser(): Promise<RequireUserResult> {
   const session = await auth();
 
   if (!session?.user?.id) {
