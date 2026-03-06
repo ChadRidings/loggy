@@ -23,7 +23,7 @@ export default function RegisterPage() {
     const registerResponse = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password }),
     });
 
     if (!registerResponse.ok) {
@@ -37,7 +37,7 @@ export default function RegisterPage() {
       email,
       password,
       redirect: false,
-      callbackUrl: "/dashboard"
+      callbackUrl: "/dashboard",
     });
 
     setLoading(false);
@@ -52,7 +52,7 @@ export default function RegisterPage() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md items-center px-6">
-      <form onSubmit={onSubmit} className="w-full rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+      <form onSubmit={onSubmit} className="w-full rounded-2xl border border-slate-200 bg-white p-8">
         <h1 className="text-2xl font-semibold text-slate-900">Create Account</h1>
         <p className="mt-2 text-sm text-slate-600">Register for Loggy.</p>
 
@@ -92,7 +92,10 @@ export default function RegisterPage() {
         </button>
 
         <p className="mt-4 text-sm text-slate-600">
-          Already have an account? <a href="/login" className="font-medium text-slate-900">Login</a>
+          Already have an account?{" "}
+          <a href="/login" className="font-medium text-slate-900">
+            Login
+          </a>
         </p>
       </form>
     </main>

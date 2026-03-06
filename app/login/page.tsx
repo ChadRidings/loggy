@@ -25,7 +25,7 @@ export default function LoginPage() {
       email,
       password,
       redirect: false,
-      callbackUrl
+      callbackUrl,
     });
 
     setLoading(false);
@@ -40,7 +40,7 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-md items-center px-6">
-      <form onSubmit={onSubmit} className="w-full rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+      <form onSubmit={onSubmit} className="w-full rounded-2xl border border-slate-200 bg-white p-8">
         <h1 className="text-2xl font-semibold text-slate-900">Loggy Login</h1>
         <p className="mt-2 text-sm text-slate-600">Sign in with your credentials account.</p>
 
@@ -80,7 +80,10 @@ export default function LoginPage() {
         </button>
 
         <p className="mt-4 text-sm text-slate-600">
-          Need an account? <a href="/register" className="font-medium text-slate-900">Register</a>
+          Need an account?{" "}
+          <a href="/register" className="font-medium text-slate-900">
+            Register
+          </a>
         </p>
       </form>
     </main>

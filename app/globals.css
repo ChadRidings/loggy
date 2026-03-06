@@ -1,7 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: light;
+  --background: var(--color-zinc-900);
+  --foreground: var(--color-slate-200);
+  --card: var(--color-slate-900);
+  --card-foreground: var(--color-slate-200);
+  --muted: var(--color-slate-400);
+  --border: var(--color-slate-700);
+  --accent: var(--color-lime-300);
 }
 
 body {

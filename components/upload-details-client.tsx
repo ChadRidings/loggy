@@ -83,7 +83,9 @@ async function fetchEvents(args: {
     }
   });
 
-  const response = await fetch(`/api/uploads/${args.uploadId}/events?${params.toString()}`, { cache: "no-store" });
+  const response = await fetch(`/api/uploads/${args.uploadId}/events?${params.toString()}`, {
+    cache: "no-store",
+  });
   if (!response.ok) throw new Error("Failed to load events");
   return (await response.json()) as { events: EventRow[]; nextCursor: string | null };
 }
@@ -97,7 +99,8 @@ function statusBadgeClass(status: string): string {
 }
 
 export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
-  const { filters, setFilter, resetFilters, selectedAnomalyId, setSelectedAnomalyId } = useUploadUiStore();
+  const { filters, setFilter, resetFilters, selectedAnomalyId, setSelectedAnomalyId } =
+    useUploadUiStore();
   const queryClient = useQueryClient();
   const previousStatusRef = useRef<string | undefined>(undefined);
 
@@ -111,21 +114,22 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
     refetchInterval: (query) => {
       const status = query.state.data?.status;
       return status === "processing" || status === "queued" ? 3000 : 0;
-    }
+    },
   });
 
-  const isProcessing = uploadQuery.data?.status === "processing" || uploadQuery.data?.status === "queued";
+  const isProcessing =
+    uploadQuery.data?.status === "processing" || uploadQuery.data?.status === "queued";
 
   const timelineQuery = useQuery({
     queryKey: ["timeline", uploadId],
     queryFn: () => fetchTimeline(uploadId),
-    refetchInterval: isProcessing ? 3000 : false
+    refetchInterval: isProcessing ? 3000 : false,
   });
 
   const anomalyQuery = useQuery({
     queryKey: ["anomalies", uploadId],
     queryFn: () => fetchAnomalies(uploadId),
-    refetchInterval: isProcessing ? 3000 : false
+    refetchInterval: isProcessing ? 3000 : false,
   });
 
   const eventFilterParams = useMemo(
@@ -135,7 +139,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
       action: filters.action,
       status_code: filters.statusCode,
       start_time: filters.startTime,
-      end_time: filters.endTime
+      end_time: filters.endTime,
     }),
     [filters]
   );
@@ -143,7 +147,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   const eventsQuery = useQuery({
     queryKey: ["events", uploadId, eventFilterParams],
     queryFn: () => fetchEvents({ uploadId, cursor: null, filters: eventFilterParams }),
-    refetchInterval: isProcessing ? 3000 : false
+    refetchInterval: isProcessing ? 3000 : false,
   });
 
   useEffect(() => {
@@ -152,7 +156,9 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
 
     const finishedNow =
       (previousStatus === "queued" || previousStatus === "processing") &&
-      (currentStatus === "completed" || currentStatus === "partial_success" || currentStatus === "failed");
+      (currentStatus === "completed" ||
+        currentStatus === "partial_success" ||
+        currentStatus === "failed");
 
     if (finishedNow) {
       void queryClient.invalidateQueries({ queryKey: ["timeline", uploadId] });
@@ -190,38 +196,53 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">{uploadQuery.data?.filename ?? "Upload details"}</h1>
-            <p className="mt-1 text-sm text-slate-600">Uploaded {uploadQuery.data ? new Date(uploadQuery.data.uploaded_at).toLocaleString() : "-"}</p>
-            {isProcessing ? <p className="mt-1 text-xs text-blue-700">Auto-refreshing timeline, events, and anomalies...</p> : null}
+            <h1 className="text-2xl font-semibold text-slate-900">
+              {uploadQuery.data?.filename ?? "Upload details"}
+            </h1>
+            <p className="mt-1 text-sm text-slate-600">
+              Uploaded{" "}
+              {uploadQuery.data ? new Date(uploadQuery.data.uploaded_at).toLocaleString() : "-"}
+            </p>
+            {isProcessing ? (
+              <p className="mt-1 text-xs text-blue-700">
+                Auto-refreshing timeline, events, and anomalies...
+              </p>
+            ) : null}
           </div>
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadgeClass(uploadQuery.data?.status ?? "queued")}`}>
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadgeClass(uploadQuery.data?.status ?? "queued")}`}
+          >
             {uploadQuery.data?.status ?? "loading"}
           </span>
         </div>
-        {uploadQuery.data?.failure_reason ? <p className="mt-3 text-sm text-red-600">{uploadQuery.data.failure_reason}</p> : null}
+        {uploadQuery.data?.failure_reason ? (
+          <p className="mt-3 text-sm text-red-600">{uploadQuery.data.failure_reason}</p>
+        ) : null}
       </section>
 
       <section className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="text-lg font-semibold text-slate-900">Timeline</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {(timelineQuery.data ?? []).map((bucket) => (
               <li key={bucket.id} className="rounded-lg border border-slate-200 p-3">
                 <p className="font-medium text-slate-900">
-                  {new Date(bucket.bucket_start).toLocaleTimeString()} - {new Date(bucket.bucket_end).toLocaleTimeString()}
+                  {new Date(bucket.bucket_start).toLocaleTimeString()} -{" "}
+                  {new Date(bucket.bucket_end).toLocaleTimeString()}
                 </p>
                 <p className="text-slate-600">
-                  Events: {bucket.event_count} · Blocked: {bucket.blocked_count} · Top IP: {bucket.top_ip ?? "-"}
+                  Events: {bucket.event_count} · Blocked: {bucket.blocked_count} · Top IP:{" "}
+                  {bucket.top_ip ?? "-"}
                 </p>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="text-lg font-semibold text-slate-900">Anomalies</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {(anomalyQuery.data ?? []).map((anomaly) => (
@@ -243,12 +264,14 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
                 </p>
               </li>
             ))}
-            {anomalyQuery.data?.length === 0 ? <li className="text-slate-600">No anomalies detected yet.</li> : null}
+            {anomalyQuery.data?.length === 0 ? (
+              <li className="text-slate-600">No anomalies detected yet.</li>
+            ) : null}
           </ul>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <div className="flex flex-wrap items-end gap-3">
           <label className="text-sm">
             Source IP
@@ -328,9 +351,15 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           </table>
         </div>
 
-        {eventsQuery.isLoading && eventRows.length === 0 ? <p className="mt-3 text-sm text-slate-600">Loading events...</p> : null}
-        {eventsQuery.isError ? <p className="mt-3 text-sm text-red-600">Failed to load events.</p> : null}
-        {!eventsQuery.isLoading && eventRows.length === 0 ? <p className="mt-3 text-sm text-slate-600">No events found.</p> : null}
+        {eventsQuery.isLoading && eventRows.length === 0 ? (
+          <p className="mt-3 text-sm text-slate-600">Loading events...</p>
+        ) : null}
+        {eventsQuery.isError ? (
+          <p className="mt-3 text-sm text-red-600">Failed to load events.</p>
+        ) : null}
+        {!eventsQuery.isLoading && eventRows.length === 0 ? (
+          <p className="mt-3 text-sm text-slate-600">No events found.</p>
+        ) : null}
 
         {nextCursor ? (
           <button

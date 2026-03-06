@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { Label, Select } from "radix-ui";
 
 type Upload = {
   id: string;
@@ -28,7 +29,7 @@ async function fetchUploads(): Promise<Upload[]> {
 async function uploadFile(formData: FormData): Promise<{ uploadId: string; status: string }> {
   const response = await fetch("/api/uploads", {
     method: "POST",
-    body: formData
+    body: formData,
   });
 
   const data = (await response.json()) as { uploadId?: string; status?: string; error?: string };
@@ -39,7 +40,7 @@ async function uploadFile(formData: FormData): Promise<{ uploadId: string; statu
 
   return {
     uploadId: data.uploadId,
-    status: data.status
+    status: data.status,
   };
 }
 
@@ -64,9 +65,11 @@ export function DashboardClient() {
     queryFn: fetchUploads,
     refetchInterval: (query) => {
       const uploads = query.state.data;
-      const hasRunning = uploads?.some((upload) => upload.status === "processing" || upload.status === "queued");
+      const hasRunning = uploads?.some(
+        (upload) => upload.status === "processing" || upload.status === "queued"
+      );
       return hasRunning ? 3000 : 0;
-    }
+    },
   });
 
   const uploadMutation = useMutation({
@@ -79,29 +82,52 @@ export function DashboardClient() {
     },
     onError: (mutationError) => {
       setError(mutationError instanceof Error ? mutationError.message : "Upload failed");
-    }
+    },
   });
 
   const sortedUploads = useMemo(() => uploadsQuery.data ?? [], [uploadsQuery.data]);
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-semibold text-slate-900">Upload Log File</h2>
         <p className="mt-1 text-sm text-slate-600">Supported files: .log or .txt (max 10MB)</p>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          <label className="text-sm font-medium text-slate-700">
-            Source Type
-            <select
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
-              value={sourceType}
-              onChange={(event) => setSourceType(event.target.value)}
-            >
-              <option value="zscaler">Zscaler-like</option>
-              <option value="generic">Generic key=value</option>
-            </select>
-          </label>
+          <div>
+            <Label.Root className="text-sm font-medium text-slate-700">Source Type</Label.Root>
+            <Select.Root value={sourceType} onValueChange={setSourceType}>
+              <Select.Trigger
+                className="mt-1 flex w-full items-center justify-between rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-900 outline-none ring-offset-2 focus:ring-2 focus:ring-slate-300"
+                aria-label="Source Type"
+              >
+                <Select.Value placeholder="Select source type" />
+                <Select.Icon className="text-slate-500">▾</Select.Icon>
+              </Select.Trigger>
+              <Select.Portal>
+                <Select.Content
+                  position="popper"
+                  sideOffset={4}
+                  className="z-50 w-(--radix-select-trigger-width) overflow-hidden rounded-lg border border-slate-200 bg-white"
+                >
+                  <Select.Viewport className="p-1">
+                    <Select.Item
+                      value="zscaler"
+                      className="relative flex cursor-pointer select-none items-center rounded-md px-3 py-2 text-sm text-slate-900 outline-none hover:bg-slate-100 focus:bg-slate-100"
+                    >
+                      <Select.ItemText>Zscaler-like</Select.ItemText>
+                    </Select.Item>
+                    <Select.Item
+                      value="generic"
+                      className="relative flex cursor-pointer select-none items-center rounded-md px-3 py-2 text-sm text-slate-900 outline-none hover:bg-slate-100 focus:bg-slate-100"
+                    >
+                      <Select.ItemText>Generic key=value</Select.ItemText>
+                    </Select.Item>
+                  </Select.Viewport>
+                </Select.Content>
+              </Select.Portal>
+            </Select.Root>
+          </div>
 
           <label className="text-sm font-medium text-slate-700">
             File
@@ -136,11 +162,15 @@ export function DashboardClient() {
         </button>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-semibold text-slate-900">Upload History</h2>
 
-        {uploadsQuery.isLoading ? <p className="mt-4 text-sm text-slate-600">Loading uploads...</p> : null}
-        {uploadsQuery.isError ? <p className="mt-4 text-sm text-red-600">Failed to load uploads.</p> : null}
+        {uploadsQuery.isLoading ? (
+          <p className="mt-4 text-sm text-slate-600">Loading uploads...</p>
+        ) : null}
+        {uploadsQuery.isError ? (
+          <p className="mt-4 text-sm text-red-600">Failed to load uploads.</p>
+        ) : null}
 
         {!uploadsQuery.isLoading && sortedUploads.length === 0 ? (
           <p className="mt-4 text-sm text-slate-600">No uploads yet.</p>
@@ -154,17 +184,25 @@ export function DashboardClient() {
                   <div>
                     <p className="font-medium text-slate-900">{upload.filename}</p>
                     <p className="text-xs text-slate-500">
-                      {new Date(upload.uploaded_at).toLocaleString()} · {(upload.raw_size_bytes / 1024).toFixed(1)} KB
+                      {new Date(upload.uploaded_at).toLocaleString()} ·{" "}
+                      {(upload.raw_size_bytes / 1024).toFixed(1)} KB
                     </p>
                   </div>
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadgeClass(upload.status)}`}>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadgeClass(upload.status)}`}
+                  >
                     {upload.status}
                   </span>
                 </div>
 
-                {upload.failure_reason ? <p className="mt-2 text-xs text-red-600">{upload.failure_reason}</p> : null}
+                {upload.failure_reason ? (
+                  <p className="mt-2 text-xs text-red-600">{upload.failure_reason}</p>
+                ) : null}
 
-                <Link href={`/uploads/${upload.id}`} className="mt-3 inline-block text-sm font-medium text-slate-900 underline">
+                <Link
+                  href={`/uploads/${upload.id}`}
+                  className="mt-3 inline-block text-sm font-medium text-slate-900 underline"
+                >
                   View Analysis
                 </Link>
               </li>
