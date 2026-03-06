@@ -124,7 +124,9 @@ npm run typecheck
 
 Sample logs are in:
 
-- `examples/zscaler-sample.log`
+- `examples/zscaler-sample.log` (default)
+- `examples/zscaler-sample2.log` (shorter)
+- `examples/zscaler-sample3.log` (longer with anomalies)
 
 ## Notes
 

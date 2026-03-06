@@ -34,14 +34,59 @@ This is an application built with utilizing the following tools: [React](https:/
 ## Project Structure
 
 .
-├── .env.example
-├── .env.local
-├── .gitignore
-├── .nvmrc
-├── .prettierrc
 ├── AGENTS.md
+├── app
+│   ├── api
+│   │   ├── auth
+│   │   │   ├── [...nextauth]
+│   │   │   │   └── route.ts
+│   │   │   └── register
+│   │   │   └── route.ts
+│   │   ├── health
+│   │   │   └── route.ts
+│   │   └── uploads
+│   │   ├── [id]
+│   │   │   ├── anomalies
+│   │   │   │   └── route.ts
+│   │   │   ├── events
+│   │   │   │   └── route.ts
+│   │   │   ├── route.ts
+│   │   │   └── timeline
+│   │   │   └── route.ts
+│   │   └── route.ts
+│   ├── dashboard
+│   │   └── page.tsx
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── login
+│   │   └── page.tsx
+│   ├── page.tsx
+│   ├── register
+│   │   └── page.tsx
+│   └── uploads
+│   └── [id]
+│   └── page.tsx
 ├── auth.ts
+├── components
+│   ├── dashboard-client.tsx
+│   ├── providers.tsx
+│   └── upload-details-client.tsx
+├── docker-compose.yml
+├── Dockerfile
 ├── eslint.config.mjs
+├── examples
+│   ├── zscaler-sample.log
+│   ├── zscaler-sample2.log
+│   └── zscaler-sample3.log
+├── lib
+│   ├── anomaly.ts
+│   ├── auth-helpers.ts
+│   ├── db.ts
+│   ├── ingestion.ts
+│   ├── parser
+│   │   └── log-parser.ts
+│   ├── uploads.ts
+│   └── users.ts
 ├── next-env.d.ts
 ├── next.config.ts
 ├── package-lock.json
@@ -49,7 +94,15 @@ This is an application built with utilizing the following tools: [React](https:/
 ├── plan.md
 ├── postcss.config.mjs
 ├── README.md
+├── store
+│   └── upload-ui-store.ts
+├── test
+│   ├── anomaly.test.ts
+│   └── log-parser.test.ts
 ├── tsconfig.json
+├── types
+│   └── next-auth.d.ts
+└── vitest.config.ts
 
 ## Code Conventions
 
