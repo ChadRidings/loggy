@@ -1,10 +1,12 @@
 import { runMigrations } from "@/lib/db";
+import { detectAnomalies } from "@/lib/anomaly";
 import { parseLogContent, type ParsedEventInput } from "@/lib/parser/log-parser";
 import {
   insertEvents,
   markUploadDone,
   markUploadFailed,
   markUploadProcessing,
+  replaceAnomalies,
   replaceTimelines
 } from "@/lib/uploads";
 
@@ -103,6 +105,8 @@ export function enqueueUploadProcessing(uploadId: string, fileContent: string): 
 
       const timelineBuckets = buildTimelineBuckets(parsed.events);
       await replaceTimelines(uploadId, timelineBuckets);
+      const anomalies = await detectAnomalies(parsed.events);
+      await replaceAnomalies(uploadId, anomalies);
 
       const finalStatus = parsed.warnings.length > 0 ? "partial_success" : "completed";
       await markUploadDone(uploadId, finalStatus);

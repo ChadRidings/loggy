@@ -195,6 +195,37 @@ export async function replaceTimelines(uploadId: string, buckets: TimelineInput[
   }
 }
 
+type AnomalyInput = {
+  eventId: string | null;
+  type: string;
+  confidenceScore: number;
+  explanation: string;
+  detectionSource: "heuristic" | "llm_hybrid";
+  llmReasoningSummary: string | null;
+};
+
+export async function replaceAnomalies(uploadId: string, anomalies: AnomalyInput[]): Promise<void> {
+  await query("DELETE FROM anomalies WHERE upload_id = $1", [uploadId]);
+
+  for (const anomaly of anomalies) {
+    await query(
+      `
+        INSERT INTO anomalies (upload_id, event_id, type, confidence_score, explanation, detection_source, llm_reasoning_summary)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `,
+      [
+        uploadId,
+        anomaly.eventId,
+        anomaly.type,
+        anomaly.confidenceScore,
+        anomaly.explanation,
+        anomaly.detectionSource,
+        anomaly.llmReasoningSummary
+      ]
+    );
+  }
+}
+
 export async function listUploads(userId: string): Promise<UploadRow[]> {
   const result = await query<UploadRow>(
     `
