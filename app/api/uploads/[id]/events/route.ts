@@ -2,26 +2,10 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { runMigrations, query } from "@/lib/db";
 import { requireApiUser } from "@/lib/auth-helpers";
+import type { EventRecord } from "@/types/loggy";
 
 type Params = {
   params: Promise<{ id: string }>;
-};
-
-type EventRow = {
-  id: string;
-  line_number: number;
-  timestamp: string;
-  src_ip: string | null;
-  user_identifier: string | null;
-  url: string | null;
-  domain: string | null;
-  http_method: string | null;
-  action: string | null;
-  status_code: number | null;
-  bytes_out: number | null;
-  user_agent: string | null;
-  severity: string | null;
-  parse_warning: string | null;
 };
 
 const querySchema = z.object({
@@ -52,7 +36,7 @@ function decodeCursor(cursor: string): { timestamp: string; id: string } | null 
   }
 }
 
-function encodeCursor(row: EventRow): string {
+function encodeCursor(row: EventRecord): string {
   return Buffer.from(JSON.stringify({ timestamp: row.timestamp, id: row.id }), "utf8").toString("base64");
 }
 
@@ -120,7 +104,7 @@ export async function GET(req: Request, { params }: Params) {
 
   values.push(parsed.data.limit + 1);
 
-  const result = await query<EventRow>(
+  const result = await query<EventRecord>(
     `
       SELECT
         e.id,

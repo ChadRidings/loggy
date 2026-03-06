@@ -5,24 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Label, Select } from "radix-ui";
+import { StatusBadge } from "@/components/status-badge";
+import type { UploadRecord } from "@/types/loggy";
 
-type Upload = {
-  id: string;
-  filename: string;
-  source_type: string;
-  status: string;
-  raw_size_bytes: number;
-  uploaded_at: string;
-  failure_reason: string | null;
-};
-
-async function fetchUploads(): Promise<Upload[]> {
+async function fetchUploads(): Promise<UploadRecord[]> {
   const response = await fetch("/api/uploads", { cache: "no-store" });
   if (!response.ok) {
     throw new Error("Failed to load uploads");
   }
 
-  const data = (await response.json()) as { uploads: Upload[] };
+  const data = (await response.json()) as { uploads: UploadRecord[] };
   return data.uploads;
 }
 
@@ -44,13 +36,13 @@ async function uploadFile(formData: FormData): Promise<{ uploadId: string; statu
   };
 }
 
-function statusBadgeClass(status: string): string {
-  if (status === "completed") return "bg-emerald-100";
-  if (status === "partial_success") return "bg-amber-100";
-  if (status === "failed") return "bg-red-100";
-  if (status === "processing") return "bg-blue-100";
-  return "bg-slate-100";
-}
+const uploadStatusBadgeStates = {
+  completed: { className: "bg-lime-300 text-slate-900" },
+  partial_success: { className: "bg-amber-100 text-slate-900" },
+  failed: { className: "bg-red-100 text-slate-900" },
+  processing: { className: "bg-blue-100 text-slate-900" },
+  queued: { className: "bg-slate-100 text-slate-900" }
+};
 
 export function DashboardClient() {
   const router = useRouter();
@@ -184,11 +176,7 @@ export function DashboardClient() {
                       {(upload.raw_size_bytes / 1024).toFixed(1)} KB
                     </p>
                   </div>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold text-slate-900 ${statusBadgeClass(upload.status)}`}
-                  >
-                    {upload.status}
-                  </span>
+                  <StatusBadge status={upload.status} states={uploadStatusBadgeStates} />
                 </div>
 
                 {upload.failure_reason ? (

@@ -3,65 +3,32 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUploadUiStore } from "@/store/upload-ui-store";
+import { StatusBadge } from "@/components/status-badge";
+import type {
+  AnomalyRecord,
+  EventRecord,
+  TimelineRecord,
+  UploadRecord,
+} from "@/types/loggy";
 
-type Upload = {
-  id: string;
-  filename: string;
-  status: string;
-  source_type: string;
-  uploaded_at: string;
-  failure_reason: string | null;
-};
-
-type TimelineRow = {
-  id: string;
-  bucket_start: string;
-  bucket_end: string;
-  event_count: number;
-  blocked_count: number;
-  top_ip: string | null;
-  top_domain: string | null;
-};
-
-type EventRow = {
-  id: string;
-  timestamp: string;
-  src_ip: string | null;
-  domain: string | null;
-  action: string | null;
-  status_code: number | null;
-  user_identifier: string | null;
-  severity: string | null;
-  parse_warning: string | null;
-};
-
-type AnomalyRow = {
-  id: string;
-  type: string;
-  confidence_score: number;
-  explanation: string;
-  detection_source: "heuristic" | "llm_hybrid";
-  llm_reasoning_summary: string | null;
-};
-
-async function fetchUpload(uploadId: string): Promise<Upload> {
+async function fetchUpload(uploadId: string): Promise<UploadRecord> {
   const response = await fetch(`/api/uploads/${uploadId}`, { cache: "no-store" });
   if (!response.ok) throw new Error("Failed to load upload");
-  const data = (await response.json()) as { upload: Upload };
+  const data = (await response.json()) as { upload: UploadRecord };
   return data.upload;
 }
 
-async function fetchTimeline(uploadId: string): Promise<TimelineRow[]> {
+async function fetchTimeline(uploadId: string): Promise<TimelineRecord[]> {
   const response = await fetch(`/api/uploads/${uploadId}/timeline`, { cache: "no-store" });
   if (!response.ok) throw new Error("Failed to load timeline");
-  const data = (await response.json()) as { timeline: TimelineRow[] };
+  const data = (await response.json()) as { timeline: TimelineRecord[] };
   return data.timeline;
 }
 
-async function fetchAnomalies(uploadId: string): Promise<AnomalyRow[]> {
+async function fetchAnomalies(uploadId: string): Promise<AnomalyRecord[]> {
   const response = await fetch(`/api/uploads/${uploadId}/anomalies`, { cache: "no-store" });
   if (!response.ok) throw new Error("Failed to load anomalies");
-  const data = (await response.json()) as { anomalies: AnomalyRow[] };
+  const data = (await response.json()) as { anomalies: AnomalyRecord[] };
   return data.anomalies;
 }
 
@@ -69,7 +36,7 @@ async function fetchEvents(args: {
   uploadId: string;
   cursor: string | null;
   filters: Record<string, string>;
-}): Promise<{ events: EventRow[]; nextCursor: string | null }> {
+}): Promise<{ events: EventRecord[]; nextCursor: string | null }> {
   const params = new URLSearchParams();
   params.set("limit", "100");
 
@@ -87,16 +54,16 @@ async function fetchEvents(args: {
     cache: "no-store",
   });
   if (!response.ok) throw new Error("Failed to load events");
-  return (await response.json()) as { events: EventRow[]; nextCursor: string | null };
+  return (await response.json()) as { events: EventRecord[]; nextCursor: string | null };
 }
 
-function statusBadgeClass(status: string): string {
-  if (status === "completed") return "bg-emerald-100";
-  if (status === "partial_success") return "bg-amber-100";
-  if (status === "failed") return "bg-red-100";
-  if (status === "processing") return "bg-blue-100";
-  return "bg-slate-100";
-}
+const uploadStatusBadgeStates = {
+  completed: { className: "bg-emerald-100 text-slate-900" },
+  partial_success: { className: "bg-amber-100 text-slate-900" },
+  failed: { className: "bg-red-100 text-slate-900" },
+  processing: { className: "bg-blue-100 text-slate-900" },
+  queued: { className: "bg-slate-100 text-slate-900" }
+};
 
 export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   const { filters, setFilter, resetFilters, selectedAnomalyId, setSelectedAnomalyId } =
@@ -104,7 +71,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   const queryClient = useQueryClient();
   const previousStatusRef = useRef<string | undefined>(undefined);
 
-  const [eventRows, setEventRows] = useState<EventRow[]>([]);
+  const [eventRows, setEventRows] = useState<EventRecord[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
 
@@ -212,11 +179,11 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
               </p>
             ) : null}
           </div>
-          <span
-            className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadgeClass(uploadQuery.data?.status ?? "queued")}`}
-          >
-            {uploadQuery.data?.status ?? "loading"}
-          </span>
+          <StatusBadge
+            status={uploadQuery.data?.status ?? "queued"}
+            states={uploadStatusBadgeStates}
+            fallback={{ className: "bg-slate-100 text-slate-900", label: "loading" }}
+          />
         </div>
         {uploadQuery.data?.failure_reason ? (
           <p className="mt-3 text-sm">{uploadQuery.data.failure_reason}</p>

@@ -1,20 +1,10 @@
 import { NextResponse } from "next/server";
 import { runMigrations, query } from "@/lib/db";
 import { requireApiUser } from "@/lib/auth-helpers";
+import type { AnomalyRecord } from "@/types/loggy";
 
 type Params = {
   params: Promise<{ id: string }>;
-};
-
-type AnomalyRow = {
-  id: string;
-  event_id: string | null;
-  type: string;
-  confidence_score: number;
-  explanation: string;
-  detection_source: "heuristic" | "llm_hybrid";
-  llm_reasoning_summary: string | null;
-  created_at: string;
 };
 
 export async function GET(_: Request, { params }: Params) {
@@ -27,7 +17,7 @@ export async function GET(_: Request, { params }: Params) {
 
   const { id: uploadId } = await params;
 
-  const result = await query<AnomalyRow>(
+  const result = await query<AnomalyRecord>(
     `
       SELECT a.id, a.event_id, a.type, a.confidence_score, a.explanation, a.detection_source, a.llm_reasoning_summary, a.created_at
       FROM anomalies a
