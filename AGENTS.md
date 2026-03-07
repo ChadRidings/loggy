@@ -69,7 +69,9 @@ This is an application built with utilizing the following tools: [React](https:/
 ├── auth.ts
 ├── components
 │   ├── dashboard-client.tsx
+│   ├── pagination-controls.tsx
 │   ├── providers.tsx
+│   ├── status-badge.tsx
 │   └── upload-details-client.tsx
 ├── docker-compose.yml
 ├── Dockerfile
@@ -100,7 +102,9 @@ This is an application built with utilizing the following tools: [React](https:/
 │   ├── anomaly.test.ts
 │   └── log-parser.test.ts
 ├── tsconfig.json
+├── tsconfig.tsbuildinfo
 ├── types
+│   ├── loggy.ts
 │   └── next-auth.d.ts
 └── vitest.config.ts
 
@@ -108,6 +112,7 @@ This is an application built with utilizing the following tools: [React](https:/
 
 - Operate as a high-level Principal Engineer and treat every task with a high-level of rigor.
 - Always check package.json for version numbers before using logic.
+- Always give PR summaries in .md format when possible.
 - Use the [Zustand](https://zustand.docs.pmnd.rs/learn/getting-started/introduction) state manager for global state.
 - Use [Radix UI](https://www.radix-ui.com/primitives/docs/overview/introduction) for UI components.
 - Use [Tailwindcss](https://tailwindcss.com/docs/installation/using-vite) for styling.
