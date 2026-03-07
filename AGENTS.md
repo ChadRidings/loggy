@@ -24,12 +24,13 @@ This is an application built with utilizing the following tools: [React](https:/
 - **CSS**: Tailwind CSS 4
 - **State Management**: Zustand
 - **Authentication**: NextAuth.js
+- **Password Security**: bcryptjs
 - **Testing**: Vitest
 - **Typechecking**: TypeScript (`tsc --noEmit`)
 - **Validation**: Zod
 - **Linting**: ESLint + Prettier
-- **Caching**: TanStack Query
-- **Database**: PostgreSQL
+- **Caching**: TanStack Query (+ React Query Devtools for local debugging)
+- **Database**: PostgreSQL via `pg`
 
 ## Project Structure
 
