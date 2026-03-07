@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Label, Select } from "radix-ui";
+import { CalendarIcon, UploadIcon, ThickArrowRightIcon } from "@radix-ui/react-icons";
 import { StatusBadge } from "@/components/status-badge";
 import type { UploadRecord } from "@/types/loggy";
 
@@ -73,7 +74,7 @@ export function DashboardClient() {
 
   return (
     <div className="grid gap-6 sm:grid-cols-2">
-      <section className="rounded-2xl border border-(--border) bg-(--background) p-6">
+      <section className="rounded-2xl border border-(--border) bg-(--background)/50 p-6">
         <h2 className="text-lg font-semibold text-white">Upload Log File</h2>
         <p className="mt-1 text-sm">Supported files: .log or .txt (max 10MB)</p>
 
@@ -113,22 +114,32 @@ export function DashboardClient() {
             </Select.Root>
           </div>
 
-          <label className="block text-sm font-medium">
-            File
+          <div className="text-sm">
+            <label
+              htmlFor="upload-file-input"
+              className="mt-1 inline-flex cursor-pointer items-center gap-2 rounded-md border border-(--border) bg-slate-900 px-3 py-2 text-sm text-slate-100 transition-colors duration-200 hover:bg-slate-800 focus-within:ring-2 focus-within:ring-(--accent)"
+            >
+              <UploadIcon className="h-4 w-4" />
+              <span>Choose File</span>
+            </label>
             <input
+              id="upload-file-input"
               type="file"
               accept=".log,.txt,text/plain"
-              className="mt-1 block text-slate-200"
+              className="sr-only"
               onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
             />
-          </label>
+            {selectedFile ? (
+              <p className="mt-1 text-xs text-slate-300">{selectedFile.name}</p>
+            ) : null}
+          </div>
         </div>
 
         {error ? <p className="mt-4 text-sm">{error}</p> : null}
 
         <button
           type="button"
-          className="mt-5 rounded-md bg-(--accent) px-4 py-2 text-sm text-white font-medium disabled:opacity-50"
+          className="mt-5 rounded-md bg-(--accent) px-4 py-2 text-sm text-(--textdark) font-medium disabled:opacity-50"
           onClick={() => {
             if (!selectedFile) {
               setError("Please select a file to upload.");
@@ -146,7 +157,7 @@ export function DashboardClient() {
         </button>
       </section>
 
-      <section className="rounded-2xl border border-(--border) bg-(--background) p-6">
+      <section className="p-6">
         <h2 className="text-lg font-semibold text-white">Upload History</h2>
 
         {uploadsQuery.isLoading ? <p className="mt-4 text-sm">Loading uploads...</p> : null}
@@ -163,7 +174,8 @@ export function DashboardClient() {
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="font-medium">{upload.filename}</p>
-                    <p className="text-xs">
+                    <p className="text-xs flex items-center">
+                      <CalendarIcon className="inline-block mr-1" />
                       {new Date(upload.uploaded_at).toLocaleString()} ·{" "}
                       {(upload.raw_size_bytes / 1024).toFixed(1)} KB
                     </p>
@@ -176,8 +188,9 @@ export function DashboardClient() {
                 ) : null}
 
                 <Link href={`/uploads/${upload.id}`} className="mt-3 inline-block">
-                  <span className="text-sm font-medium text-(--accent) hover:text-white transition-colors duration-300 ease-in-out">
-                    View Analysis
+                  <span className="flex items-center text-sm text-(--accent) hover:text-white transition-colors duration-300 ease-in-out">
+                    View analysis
+                    <ThickArrowRightIcon className="ml-1" />
                   </span>
                 </Link>
               </li>

@@ -194,7 +194,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
       <Separator.Root className="h-px bg-slate-700/40" />
 
       <section className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-2xl border border-(--border) bg-(--background) p-6">
+        <div className="p-6">
           <h2 className="text-lg font-semibold text-white">Timeline</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {visibleTimelineItems.map((bucket) => (
@@ -219,7 +219,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           />
         </div>
 
-        <div className="rounded-2xl border border-(--border) bg-(--background) p-6">
+        <div className="p-6">
           <h2 className="text-lg font-semibold text-white">Anomalies</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {visibleAnomalyItems.map((anomaly) => (
@@ -230,7 +230,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
               >
                 <div className="flex items-center justify-between gap-2">
                   <p className="font-medium">{anomaly.type}</p>
-                  <span className="rounded-full bg-(--accent) px-2 py-1 text-xs text-white">
+                  <span className="rounded-full bg-(--accent) px-2 py-1 text-xs text-(--textdark)">
                     {Number(anomaly.confidence_score).toFixed(2)} / 10
                   </span>
                 </div>
@@ -254,72 +254,86 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
       </section>
 
       <section className="rounded-2xl border border-(--border) bg-(--background) p-6">
-        <Form.Root className="flex flex-wrap items-end gap-3">
+        <Form.Root className="flex items-center justify-start gap-3">
+          <div className="text-white text-sm">Filter By:</div>
           <Form.Field name="src_ip" className="text-sm">
-            <Form.Label htmlFor="filter-src-ip">Source IP</Form.Label>
             <Form.Control asChild>
               <input
+                type="text"
+                name="Source IP"
+                aria-label="Source IP"
                 id="filter-src-ip"
                 className="mt-1 w-36 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                placeholder="Source IP"
                 value={filters.srcIp}
                 onChange={(event) => setFilter("srcIp", event.target.value)}
               />
             </Form.Control>
           </Form.Field>
+
           <Form.Field name="domain" className="text-sm">
-            <Form.Label htmlFor="filter-domain">Domain</Form.Label>
             <Form.Control asChild>
               <input
+                type="text"
+                name="Domain"
+                aria-label="Domain"
                 id="filter-domain"
                 className="mt-1 w-44 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                placeholder="Domain"
                 value={filters.domain}
                 onChange={(event) => setFilter("domain", event.target.value)}
               />
             </Form.Control>
           </Form.Field>
+
           <Form.Field name="action" className="text-sm">
-            <Form.Label htmlFor="filter-action">Action</Form.Label>
             <Form.Control asChild>
               <input
+                type="text"
+                name="Action"
+                aria-label="Action"
                 id="filter-action"
                 className="mt-1 w-32 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                placeholder="Action"
                 value={filters.action}
                 onChange={(event) => setFilter("action", event.target.value)}
               />
             </Form.Control>
           </Form.Field>
+
           <Form.Field name="status_code" className="text-sm">
-            <Form.Label htmlFor="filter-status">Status</Form.Label>
             <Form.Control asChild>
               <input
+                type="text"
+                name="Status"
+                aria-label="Status"
                 id="filter-status"
                 className="mt-1 w-24 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                placeholder="Status"
                 value={filters.statusCode}
                 onChange={(event) => setFilter("statusCode", event.target.value)}
               />
             </Form.Control>
           </Form.Field>
-          <button
-            type="button"
-            className="rounded-lg border border-(--border) px-3 py-2 text-sm"
-            onClick={() => void eventsQuery.refetch()}
-          >
-            Apply Filters
-          </button>
-          <button
-            type="button"
-            className="rounded-lg border border-(--border) px-3 py-2 text-sm"
-            onClick={() => {
-              resetFilters();
-              void eventsQuery.refetch();
-            }}
-          >
-            Reset
-          </button>
-        </Form.Root>
 
-        <div className="mt-4 overflow-x-auto linear-bg">
-          <table className="w-full min-w-[720px] border-collapse text-sm">
+          <div>
+            <button
+              type="button"
+              className="rounded-lg border border-(--border) px-3 py-2 text-sm"
+              onClick={() => {
+                resetFilters();
+                void eventsQuery.refetch();
+              }}
+            >
+              Reset
+            </button>
+          </div>
+        </Form.Root>
+      </section>
+
+      <section className="rounded-2xl border border-(--border) bg-(--background) p-6">
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-180 border-collapse text-sm">
             <thead>
               <tr className="border-b border-(--border) text-left">
                 <th className="pb-2">Timestamp</th>
