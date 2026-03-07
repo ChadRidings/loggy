@@ -1,19 +1,10 @@
 import { NextResponse } from "next/server";
 import { runMigrations, query } from "@/lib/db";
 import { requireApiUser } from "@/lib/auth-helpers";
+import type { TimelineRecord } from "@/types/loggy";
 
 type Params = {
   params: Promise<{ id: string }>;
-};
-
-type TimelineRow = {
-  id: string;
-  bucket_start: string;
-  bucket_end: string;
-  event_count: number;
-  blocked_count: number;
-  top_ip: string | null;
-  top_domain: string | null;
 };
 
 export async function GET(_: Request, { params }: Params) {
@@ -26,7 +17,7 @@ export async function GET(_: Request, { params }: Params) {
 
   const { id: uploadId } = await params;
 
-  const result = await query<TimelineRow>(
+  const result = await query<TimelineRecord>(
     `
       SELECT t.id, t.bucket_start, t.bucket_end, t.event_count, t.blocked_count, t.top_ip, t.top_domain
       FROM timelines t

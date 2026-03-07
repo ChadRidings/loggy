@@ -17,7 +17,7 @@ export default async function UploadDetailsPage({ params }: Params) {
 
   return (
     <main className="mx-auto w-full max-w-6xl px-6 py-10">
-      <Link href="/dashboard" className="mb-6 inline-block text-sm font-medium text-slate-700 underline">
+      <Link href="/dashboard" className="mb-6 inline-block text-sm font-medium underline">
         Back to dashboard
       </Link>
       <UploadDetailsClient uploadId={id} />

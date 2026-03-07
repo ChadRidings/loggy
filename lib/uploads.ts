@@ -1,26 +1,9 @@
 import { query } from "@/lib/db";
 import type { ParsedEventInput } from "@/lib/parser/log-parser";
+import type { IngestionJobRecord, UploadRecord } from "@/types/loggy";
 
-export type UploadRow = {
-  id: string;
-  user_id: string;
-  filename: string;
-  source_type: string;
-  status: string;
-  raw_size_bytes: number;
-  uploaded_at: string;
-  failure_reason: string | null;
-};
-
-export type IngestionJobRow = {
-  id: string;
-  upload_id: string;
-  status: string;
-  attempt_count: number;
-  started_at: string | null;
-  finished_at: string | null;
-  last_error: string | null;
-};
+export type UploadRow = UploadRecord;
+export type IngestionJobRow = IngestionJobRecord;
 
 export async function createUpload(args: {
   userId: string;
