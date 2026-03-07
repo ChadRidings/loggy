@@ -110,14 +110,20 @@ This is an application built with utilizing the following tools: [React](https:/
 
 ## Code Conventions
 
-- Operate as a high-level Principal Engineer and treat every task with a high-level of rigor.
+- Operate as a high-level Staff Engineer and treat every task with a high-level of rigor.
 - Always check package.json for version numbers before using logic.
-- Always give PR summaries in .md format when possible.
+- Always give PR summaries in .md format.
+
+## Dependencies
+
 - Use the [Zustand](https://zustand.docs.pmnd.rs/learn/getting-started/introduction) state manager for global state.
 - Use [Radix UI](https://www.radix-ui.com/primitives/docs/overview/introduction) for UI components.
 - Use [Tailwindcss](https://tailwindcss.com/docs/installation/using-vite) for styling.
 - Use [NextAuth.js](https://next-auth.js.org/getting-started/introduction) for authentication.
 - Use [Tanstack Query](https://tanstack.com/query/latest/docs/framework/react/overview) for caching.
+- Use [TanStack Query Devtools](https://tanstack.com/query/latest/docs/framework/react/devtools) for local query debugging when needed.
 - Use [Zod](https://zod.dev/) for validation.
+- Use [pg](https://node-postgres.com/) as the PostgreSQL client in the backend.
+- Use [bcryptjs](https://www.npmjs.com/package/bcryptjs) for password hashing and verification.
 - Use [ESLint](https://eslint.org/docs/latest/) and [prettier](https://prettier.io/docs/) for linting.
 - Use [Vitest](https://vitest.dev/guide/) for testing.
