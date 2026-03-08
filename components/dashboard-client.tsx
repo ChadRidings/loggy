@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { Label, Select } from "radix-ui";
 import { CalendarIcon, UploadIcon, ThickArrowRightIcon } from "@radix-ui/react-icons";
 import { StatusBadge } from "@/components/status-badge";
@@ -44,6 +44,8 @@ export function DashboardClient() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [sourceType, setSourceType] = useState("zscaler");
   const [error, setError] = useState<string | null>(null);
+  const sourceTypeTriggerId = useId();
+  const sourceTypeContentId = useId();
 
   const uploadsQuery = useQuery({
     queryKey: ["uploads"],
@@ -74,87 +76,93 @@ export function DashboardClient() {
 
   return (
     <div className="grid gap-6 sm:grid-cols-2">
-      <section className="rounded-2xl border border-(--border) bg-(--background)/50 p-6">
-        <h2 className="text-lg font-semibold text-white">Upload Log File</h2>
-        <p className="mt-1 text-sm">Supported files: .log or .txt (max 10MB)</p>
+      <section className="pt-6">
+        <div className="rounded-2xl border border-(--border) bg-(--background)/50 p-6">
+          <h2 className="text-lg font-semibold text-white">Upload Log File</h2>
+          <p className="mt-1 text-sm">Supported files: .log or .txt (max 10MB)</p>
 
-        <div className="mt-5 space-y-4">
-          <div>
-            <Label.Root className="text-sm font-medium">Source Type</Label.Root>
-            <Select.Root value={sourceType} onValueChange={setSourceType}>
-              <Select.Trigger
-                className="mt-1 flex w-full items-center justify-between rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-left text-sm text-slate-200 outline-none"
-                aria-label="Source Type"
-              >
-                <Select.Value placeholder="Select source type" />
-                <Select.Icon className="text-slate-200">▾</Select.Icon>
-              </Select.Trigger>
-              <Select.Portal>
-                <Select.Content
-                  position="popper"
-                  sideOffset={4}
-                  className="z-50 w-(--radix-select-trigger-width) overflow-hidden rounded-lg border border-slate-600 bg-slate-900"
+          <div className="mt-5 space-y-4">
+            <div>
+              <Label.Root htmlFor={sourceTypeTriggerId} className="text-sm font-medium">
+                Source Type
+              </Label.Root>
+              <Select.Root value={sourceType} onValueChange={setSourceType}>
+                <Select.Trigger
+                  id={sourceTypeTriggerId}
+                  aria-controls={sourceTypeContentId}
+                  className="mt-1 flex w-full items-center justify-between rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-left text-sm text-slate-200 outline-none"
                 >
-                  <Select.Viewport className="p-1">
-                    <Select.Item
-                      value="zscaler"
-                      className="relative flex cursor-pointer select-none items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none hover:bg-slate-800 focus:bg-slate-800"
-                    >
-                      <Select.ItemText>Zscaler-like</Select.ItemText>
-                    </Select.Item>
-                    <Select.Item
-                      value="generic"
-                      className="relative flex cursor-pointer select-none items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none hover:bg-slate-800 focus:bg-slate-800"
-                    >
-                      <Select.ItemText>Generic key=value</Select.ItemText>
-                    </Select.Item>
-                  </Select.Viewport>
-                </Select.Content>
-              </Select.Portal>
-            </Select.Root>
+                  <Select.Value placeholder="Select source type" />
+                  <Select.Icon className="text-slate-200">▾</Select.Icon>
+                </Select.Trigger>
+                <Select.Portal>
+                  <Select.Content
+                    id={sourceTypeContentId}
+                    position="popper"
+                    sideOffset={4}
+                    className="z-50 w-(--radix-select-trigger-width) overflow-hidden rounded-lg border border-slate-600 bg-slate-900"
+                  >
+                    <Select.Viewport className="p-1">
+                      <Select.Item
+                        value="zscaler"
+                        className="relative flex cursor-pointer select-none items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none hover:bg-slate-800 focus:bg-slate-800"
+                      >
+                        <Select.ItemText>Zscaler-like</Select.ItemText>
+                      </Select.Item>
+                      <Select.Item
+                        value="generic"
+                        className="relative flex cursor-pointer select-none items-center rounded-md px-3 py-2 text-sm text-slate-200 outline-none hover:bg-slate-800 focus:bg-slate-800"
+                      >
+                        <Select.ItemText>Generic key=value</Select.ItemText>
+                      </Select.Item>
+                    </Select.Viewport>
+                  </Select.Content>
+                </Select.Portal>
+              </Select.Root>
+            </div>
+
+            <div className="text-sm">
+              <label
+                htmlFor="upload-file-input"
+                className="mt-1 inline-flex cursor-pointer items-center gap-2 rounded-md border border-(--border) bg-slate-900 px-3 py-2 text-sm text-slate-100 transition-colors duration-200 hover:bg-slate-800 focus-within:ring-2 focus-within:ring-(--accent)"
+              >
+                <UploadIcon className="h-4 w-4" />
+                <span>Choose File</span>
+              </label>
+              <input
+                id="upload-file-input"
+                type="file"
+                accept=".log,.txt,text/plain"
+                className="sr-only"
+                onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
+              />
+              {selectedFile ? (
+                <p className="mt-1 text-xs text-slate-300">{selectedFile.name}</p>
+              ) : null}
+            </div>
           </div>
 
-          <div className="text-sm">
-            <label
-              htmlFor="upload-file-input"
-              className="mt-1 inline-flex cursor-pointer items-center gap-2 rounded-md border border-(--border) bg-slate-900 px-3 py-2 text-sm text-slate-100 transition-colors duration-200 hover:bg-slate-800 focus-within:ring-2 focus-within:ring-(--accent)"
-            >
-              <UploadIcon className="h-4 w-4" />
-              <span>Choose File</span>
-            </label>
-            <input
-              id="upload-file-input"
-              type="file"
-              accept=".log,.txt,text/plain"
-              className="sr-only"
-              onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
-            />
-            {selectedFile ? (
-              <p className="mt-1 text-xs text-slate-300">{selectedFile.name}</p>
-            ) : null}
-          </div>
+          {error ? <p className="mt-4 text-sm">{error}</p> : null}
+
+          <button
+            type="button"
+            className="mt-5 rounded-md bg-(--accent) px-4 py-2 text-sm text-(--textdark) font-medium disabled:opacity-50"
+            onClick={() => {
+              if (!selectedFile) {
+                setError("Please select a file to upload.");
+                return;
+              }
+
+              const formData = new FormData();
+              formData.append("file", selectedFile);
+              formData.append("sourceType", sourceType);
+              uploadMutation.mutate(formData);
+            }}
+            disabled={uploadMutation.isPending}
+          >
+            {uploadMutation.isPending ? "Uploading..." : "Upload"}
+          </button>
         </div>
-
-        {error ? <p className="mt-4 text-sm">{error}</p> : null}
-
-        <button
-          type="button"
-          className="mt-5 rounded-md bg-(--accent) px-4 py-2 text-sm text-(--textdark) font-medium disabled:opacity-50"
-          onClick={() => {
-            if (!selectedFile) {
-              setError("Please select a file to upload.");
-              return;
-            }
-
-            const formData = new FormData();
-            formData.append("file", selectedFile);
-            formData.append("sourceType", sourceType);
-            uploadMutation.mutate(formData);
-          }}
-          disabled={uploadMutation.isPending}
-        >
-          {uploadMutation.isPending ? "Uploading..." : "Upload"}
-        </button>
       </section>
 
       <section className="p-6">

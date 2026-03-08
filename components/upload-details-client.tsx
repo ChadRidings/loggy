@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Form, Separator } from "radix-ui";
 import { useUploadUiStore } from "@/store/upload-ui-store";
 import { StatusBadge } from "@/components/status-badge";
@@ -59,9 +59,10 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
     useUploadUiStore();
   const queryClient = useQueryClient();
   const previousStatusRef = useRef<string | undefined>(undefined);
+  const eventsScrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const eventsScrollSentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const [eventRows, setEventRows] = useState<EventRecord[]>([]);
-  const [eventsPage, setEventsPage] = useState(1);
+  const [processingRefreshTick, setProcessingRefreshTick] = useState(0);
   const [timelinePage, setTimelinePage] = useState(1);
   const [anomalyPage, setAnomalyPage] = useState(1);
 
@@ -101,10 +102,12 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
     [filters]
   );
 
-  const eventsQuery = useQuery({
-    queryKey: ["events", uploadId, eventFilterParams],
-    queryFn: () => fetchEvents({ uploadId, cursor: null, filters: eventFilterParams }),
-    refetchInterval: isProcessing ? 3000 : false,
+  const eventsQuery = useInfiniteQuery({
+    queryKey: ["events", uploadId, eventFilterParams, processingRefreshTick],
+    queryFn: ({ pageParam }) =>
+      fetchEvents({ uploadId, cursor: pageParam, filters: eventFilterParams }),
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
 
   useEffect(() => {
@@ -127,13 +130,57 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   }, [queryClient, uploadId, uploadQuery.data?.status]);
 
   useEffect(() => {
-    if (!eventsQuery.data) {
+    if (!isProcessing) {
       return;
     }
 
-    setEventRows(eventsQuery.data.events);
-    setEventsPage(1);
-  }, [eventsQuery.data]);
+    const intervalId = window.setInterval(() => {
+      setProcessingRefreshTick((value) => value + 1);
+    }, 3000);
+
+    return () => window.clearInterval(intervalId);
+  }, [isProcessing]);
+
+  useEffect(() => {
+    const root = eventsScrollContainerRef.current;
+    const sentinel = eventsScrollSentinelRef.current;
+
+    if (!root || !sentinel) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const isIntersecting = entries.some((entry) => entry.isIntersecting);
+        if (!isIntersecting || !eventsQuery.hasNextPage || eventsQuery.isFetchingNextPage) {
+          return;
+        }
+        void eventsQuery.fetchNextPage();
+      },
+      {
+        root,
+        rootMargin: "200px 0px",
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, [
+    eventsQuery.fetchNextPage,
+    eventsQuery.hasNextPage,
+    eventsQuery.isFetchingNextPage,
+    eventsQuery.data?.pages.length,
+  ]);
+
+  useEffect(() => {
+    const root = eventsScrollContainerRef.current;
+    if (!root) {
+      return;
+    }
+
+    root.scrollTop = 0;
+  }, [eventFilterParams, processingRefreshTick]);
 
   useEffect(() => {
     setTimelinePage(1);
@@ -158,11 +205,9 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
     anomalyPage * pageSize
   );
 
-  const eventsPageSize = 15;
-  const eventsTotalPages = Math.max(1, Math.ceil(eventRows.length / eventsPageSize));
-  const visibleEventRows = eventRows.slice(
-    (eventsPage - 1) * eventsPageSize,
-    eventsPage * eventsPageSize
+  const eventRows = useMemo(
+    () => eventsQuery.data?.pages.flatMap((page) => page.events) ?? [],
+    [eventsQuery.data]
   );
 
   return (
@@ -254,85 +299,84 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
       </section>
 
       <section className="rounded-2xl border border-(--border) bg-(--background) p-6">
-        <Form.Root className="flex items-center justify-start gap-3">
-          <div className="text-white text-sm">Filter By:</div>
-          <Form.Field name="src_ip" className="text-sm">
-            <Form.Control asChild>
-              <input
-                type="text"
-                name="Source IP"
-                aria-label="Source IP"
-                id="filter-src-ip"
-                className="mt-1 w-36 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
-                placeholder="Source IP"
-                value={filters.srcIp}
-                onChange={(event) => setFilter("srcIp", event.target.value)}
-              />
-            </Form.Control>
-          </Form.Field>
+        <section className="border-b border-(--border) pb-4">
+          <Form.Root className="flex items-center justify-start gap-3">
+            <div className="text-white text-sm">Filter By:</div>
+            <Form.Field name="src_ip" className="text-sm">
+              <Form.Control asChild>
+                <input
+                  type="text"
+                  name="Source IP"
+                  aria-label="Source IP"
+                  id="filter-src-ip"
+                  className="w-36 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                  placeholder="Source IP"
+                  value={filters.srcIp}
+                  onChange={(event) => setFilter("srcIp", event.target.value)}
+                />
+              </Form.Control>
+            </Form.Field>
 
-          <Form.Field name="domain" className="text-sm">
-            <Form.Control asChild>
-              <input
-                type="text"
-                name="Domain"
-                aria-label="Domain"
-                id="filter-domain"
-                className="mt-1 w-44 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
-                placeholder="Domain"
-                value={filters.domain}
-                onChange={(event) => setFilter("domain", event.target.value)}
-              />
-            </Form.Control>
-          </Form.Field>
+            <Form.Field name="domain" className="text-sm">
+              <Form.Control asChild>
+                <input
+                  type="text"
+                  name="Domain"
+                  aria-label="Domain"
+                  id="filter-domain"
+                  className="w-44 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                  placeholder="Domain"
+                  value={filters.domain}
+                  onChange={(event) => setFilter("domain", event.target.value)}
+                />
+              </Form.Control>
+            </Form.Field>
 
-          <Form.Field name="action" className="text-sm">
-            <Form.Control asChild>
-              <input
-                type="text"
-                name="Action"
-                aria-label="Action"
-                id="filter-action"
-                className="mt-1 w-32 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
-                placeholder="Action"
-                value={filters.action}
-                onChange={(event) => setFilter("action", event.target.value)}
-              />
-            </Form.Control>
-          </Form.Field>
+            <Form.Field name="action" className="text-sm">
+              <Form.Control asChild>
+                <input
+                  type="text"
+                  name="Action"
+                  aria-label="Action"
+                  id="filter-action"
+                  className="w-32 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                  placeholder="Action"
+                  value={filters.action}
+                  onChange={(event) => setFilter("action", event.target.value)}
+                />
+              </Form.Control>
+            </Form.Field>
 
-          <Form.Field name="status_code" className="text-sm">
-            <Form.Control asChild>
-              <input
-                type="text"
-                name="Status"
-                aria-label="Status"
-                id="filter-status"
-                className="mt-1 w-24 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
-                placeholder="Status"
-                value={filters.statusCode}
-                onChange={(event) => setFilter("statusCode", event.target.value)}
-              />
-            </Form.Control>
-          </Form.Field>
+            <Form.Field name="status_code" className="text-sm">
+              <Form.Control asChild>
+                <input
+                  type="text"
+                  name="Status"
+                  aria-label="Status"
+                  id="filter-status"
+                  className="w-24 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                  placeholder="Status"
+                  value={filters.statusCode}
+                  onChange={(event) => setFilter("statusCode", event.target.value)}
+                />
+              </Form.Control>
+            </Form.Field>
 
-          <div>
-            <button
-              type="button"
-              className="rounded-lg border border-(--border) px-3 py-2 text-sm"
-              onClick={() => {
-                resetFilters();
-                void eventsQuery.refetch();
-              }}
-            >
-              Reset
-            </button>
-          </div>
-        </Form.Root>
-      </section>
+            <div>
+              <button
+                type="button"
+                className="rounded-md border border-(--border) bg-(--accent) px-3 py-1 text-sm text-(--textdark) hover:bg-(--accent)/70 transition-colors duration-300 ease-in-out"
+                onClick={() => {
+                  resetFilters();
+                }}
+              >
+                Reset
+              </button>
+            </div>
+          </Form.Root>
+        </section>
 
-      <section className="rounded-2xl border border-(--border) bg-(--background) p-6">
-        <div className="mt-4 overflow-x-auto">
+        <div ref={eventsScrollContainerRef} className="mt-4 h-[500px] overflow-auto">
           <table className="w-full min-w-180 border-collapse text-sm">
             <thead>
               <tr className="border-b border-(--border) text-left">
@@ -345,7 +389,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
               </tr>
             </thead>
             <tbody>
-              {visibleEventRows.map((event) => (
+              {eventRows.map((event) => (
                 <tr key={event.id} className="border-b border-(--border)">
                   <td className="py-2 pr-2">{new Date(event.timestamp).toLocaleString()}</td>
                   <td className="py-2 pr-2">{event.src_ip ?? "-"}</td>
@@ -357,6 +401,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
               ))}
             </tbody>
           </table>
+          <div ref={eventsScrollSentinelRef} className="h-4" aria-hidden="true" />
         </div>
 
         {eventsQuery.isLoading && eventRows.length === 0 ? (
@@ -366,14 +411,9 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
         {!eventsQuery.isLoading && eventRows.length === 0 ? (
           <p className="mt-3 text-sm">No events found.</p>
         ) : null}
-
-        <PaginationControls
-          currentPage={eventsPage}
-          totalPages={eventsTotalPages}
-          onPageChange={setEventsPage}
-          ariaLabel="Events pagination"
-          className="mt-4 flex items-center justify-between text-xs"
-        />
+        {eventsQuery.isFetchingNextPage ? (
+          <p className="mt-3 text-sm">Loading more events...</p>
+        ) : null}
       </section>
     </div>
   );
