@@ -17,7 +17,7 @@ export default async function UploadDetailsPage({ params }: Params) {
   const { id } = await params;
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-6 py-10">
+    <main className="mx-auto w-full max-w-7xl p-6 lg:px-6 lg:py-10">
       <Link
         href="/dashboard"
         className="mb-6 text-sm flex items-center text-(--accent) hover:text-white transition-colors duration-300 ease-in-out"

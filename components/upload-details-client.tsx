@@ -238,8 +238,8 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
 
       <Separator.Root className="h-px bg-slate-700/40" />
 
-      <section className="grid gap-6 md:grid-cols-2">
-        <div className="p-6">
+      <section className="grid gap-6 lg:grid-cols-2">
+        <div className="p-0 lg:p-6">
           <h2 className="text-lg font-semibold text-white">Timeline</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {visibleTimelineItems.map((bucket) => (
@@ -264,7 +264,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           />
         </div>
 
-        <div className="p-6">
+        <div className="p-0 lg:p-6">
           <h2 className="text-lg font-semibold text-white">Anomalies</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {visibleAnomalyItems.map((anomaly) => (
@@ -299,7 +299,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
       </section>
 
       <section className="rounded-2xl border border-(--border) bg-(--background)/50 p-6">
-        <section className="border-b border-(--border) pb-4">
+        <section className="border-b border-(--border) pb-4 overflow-auto">
           <Form.Root className="flex items-center justify-start gap-3">
             <div className="text-white text-sm">Filter By:</div>
             <Form.Field name="src_ip" className="text-sm">

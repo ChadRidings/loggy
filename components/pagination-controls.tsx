@@ -1,5 +1,3 @@
-import { ToggleGroup } from "radix-ui";
-
 type PaginationControlsProps = {
   currentPage: number;
   totalPages: number;
@@ -20,47 +18,57 @@ export function PaginationControls({
   }
 
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+  const lastPage = totalPages;
+
+  const compactPages = (() => {
+    if (totalPages <= 4) {
+      return pages;
+    }
+
+    if (currentPage <= 2) {
+      return [1, 2, 3, lastPage];
+    }
+
+    if (currentPage >= lastPage - 1) {
+      return [1, lastPage - 2, lastPage - 1, lastPage];
+    }
+
+    return [1, currentPage - 1, currentPage, currentPage + 1, lastPage];
+  })();
+  const pageButtonBaseClass =
+    "min-w-10 rounded-md border px-2 py-1.5 text-sm transition-colors duration-300 ease-in-out";
+  const pageButtonActiveClass = "border-(--accent) bg-(--accent) text-(--textdark)";
+  const pageButtonInactiveClass = "border-(--border) bg-white/5 text-(--accent) hover:border-(--accent)";
 
   return (
-    <div className={className ?? "mt-4 flex items-center justify-between text-xs"}>
-      <button
-        type="button"
-        className="rounded border border-(--border) px-2 py-1 text-slate-300 hover:text-(--accent) hover:border-(--accent) transition-colors duration-300 ease-in-out disabled:opacity-50 disabled:hover:text-slate-300 disabled:hover:border-(--border)"
-        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-        disabled={currentPage === 1}
-      >
-        Previous
-      </button>
-      <ToggleGroup.Root
-        type="single"
-        value={String(currentPage)}
-        onValueChange={(value) => {
-          if (value) {
-            onPageChange(Number(value));
-          }
-        }}
-        aria-label={ariaLabel}
-        className="flex items-center gap-1"
-      >
-        {pages.map((page) => (
-          <ToggleGroup.Item
-            key={page}
-            value={String(page)}
-            className="rounded border border-slate-300 px-2 py-1 data-[state=on]:bg-slate-900 data-[state=on]:text-(--accent) data-[state=on]:border-(--accent) disabled:opacity-50"
-            aria-label={`Go to page ${page}`}
-          >
-            {page}
-          </ToggleGroup.Item>
-        ))}
-      </ToggleGroup.Root>
-      <button
-        type="button"
-        className="rounded border border-(--border) px-2 py-1 text-slate-300 hover:text-(--accent) hover:border-(--accent) transition-colors duration-300 ease-in-out disabled:opacity-50 disabled:hover:text-slate-300 disabled:hover:border-(--border)"
-        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-        disabled={currentPage === totalPages}
-      >
-        Next
-      </button>
-    </div>
+    <nav
+      aria-label={ariaLabel}
+      className={className ?? "mt-4 flex items-center justify-center text-xs"}
+    >
+      <div className="flex w-full items-center justify-center gap-1">
+        {compactPages.map((page, index) => {
+          const previous = compactPages[index - 1];
+          const showEllipsis = previous !== undefined && page - previous > 1;
+
+          return (
+            <div key={page} className="flex items-center gap-1">
+              {showEllipsis ? <span className="px-1 text-(--accent)">...</span> : null}
+              <button
+                type="button"
+                className={`${pageButtonBaseClass} ${
+                  page === currentPage
+                    ? pageButtonActiveClass
+                    : pageButtonInactiveClass
+                }`}
+                onClick={() => onPageChange(page)}
+                aria-label={`Go to page ${page}`}
+              >
+                {page}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </nav>
   );
 }
