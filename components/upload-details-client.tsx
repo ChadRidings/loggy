@@ -238,7 +238,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
 
       <Separator.Root className="h-px bg-slate-700/40" />
 
-      <section className="grid gap-6 lg:grid-cols-2">
+      <section className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         <div className="p-0 lg:p-6">
           <h2 className="text-lg font-semibold text-white">Timeline</h2>
           <ul className="mt-4 space-y-2 text-sm">

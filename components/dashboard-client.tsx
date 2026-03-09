@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useId, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Label, Select } from "radix-ui";
 import { CalendarIcon, UploadIcon, ThickArrowRightIcon } from "@radix-ui/react-icons";
 import { StatusBadge } from "@/components/status-badge";
@@ -44,8 +44,8 @@ export function DashboardClient() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [sourceType, setSourceType] = useState("zscaler");
   const [error, setError] = useState<string | null>(null);
-  const sourceTypeTriggerId = useId();
-  const sourceTypeContentId = useId();
+  const sourceTypeTriggerId = "dashboard-source-type-trigger";
+  const sourceTypeContentId = "dashboard-source-type-content";
 
   const uploadsQuery = useQuery({
     queryKey: ["uploads"],
