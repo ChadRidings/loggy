@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { AppNavigation } from "@/components/app-navigation";
-import { DashboardClient } from "@/components/dashboard-client";
+import { ArchiveClient } from "@/components/archive-client";
 
-export default async function DashboardPage() {
+export default async function ArchivePage() {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -14,9 +14,9 @@ export default async function DashboardPage() {
     <>
       <AppNavigation />
       <main className="mx-auto w-full max-w-7xl px-6 py-10">
-        <h1 className="text-2xl font-semibold text-white">Loggy Dashboard</h1>
+        <h1 className="text-2xl font-semibold text-white">Log Archive</h1>
         <p className="mt-1 text-sm mb-4">Signed in as {session.user.email}</p>
-        <DashboardClient />
+        <ArchiveClient />
       </main>
     </>
   );
