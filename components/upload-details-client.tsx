@@ -299,81 +299,92 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
       </section>
 
       <section className="rounded-2xl border border-(--border) bg-(--background)/50 p-6">
-        <section className="border-b border-(--border) pb-4 overflow-auto">
-          <Form.Root className="flex items-center justify-start gap-3">
-            <div className="text-white text-sm">Filter By:</div>
-            <Form.Field name="src_ip" className="text-sm">
-              <Form.Control asChild>
-                <input
-                  type="text"
-                  name="Source IP"
-                  aria-label="Source IP"
-                  id="filter-src-ip"
-                  className="w-36 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
-                  placeholder="Source IP"
-                  value={filters.srcIp}
-                  onChange={(event) => setFilter("srcIp", event.target.value)}
-                />
-              </Form.Control>
-            </Form.Field>
+        <section className="border-b border-(--border) pb-4">
+          <ScrollArea.Root className="overflow-hidden">
+            <ScrollArea.Viewport className="w-full pb-4">
+              <Form.Root className="flex min-w-max items-center justify-start gap-3">
+                <div className="text-white text-sm">Filter By:</div>
+                <Form.Field name="src_ip" className="text-sm">
+                  <Form.Control asChild>
+                    <input
+                      type="text"
+                      name="Source IP"
+                      aria-label="Source IP"
+                      id="filter-src-ip"
+                      className="w-36 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                      placeholder="Source IP"
+                      value={filters.srcIp}
+                      onChange={(event) => setFilter("srcIp", event.target.value)}
+                    />
+                  </Form.Control>
+                </Form.Field>
 
-            <Form.Field name="domain" className="text-sm">
-              <Form.Control asChild>
-                <input
-                  type="text"
-                  name="Domain"
-                  aria-label="Domain"
-                  id="filter-domain"
-                  className="w-44 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
-                  placeholder="Domain"
-                  value={filters.domain}
-                  onChange={(event) => setFilter("domain", event.target.value)}
-                />
-              </Form.Control>
-            </Form.Field>
+                <Form.Field name="domain" className="text-sm">
+                  <Form.Control asChild>
+                    <input
+                      type="text"
+                      name="Domain"
+                      aria-label="Domain"
+                      id="filter-domain"
+                      className="w-44 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                      placeholder="Domain"
+                      value={filters.domain}
+                      onChange={(event) => setFilter("domain", event.target.value)}
+                    />
+                  </Form.Control>
+                </Form.Field>
 
-            <Form.Field name="action" className="text-sm">
-              <Form.Control asChild>
-                <input
-                  type="text"
-                  name="Action"
-                  aria-label="Action"
-                  id="filter-action"
-                  className="w-32 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
-                  placeholder="Action"
-                  value={filters.action}
-                  onChange={(event) => setFilter("action", event.target.value)}
-                />
-              </Form.Control>
-            </Form.Field>
+                <Form.Field name="action" className="text-sm">
+                  <Form.Control asChild>
+                    <input
+                      type="text"
+                      name="Action"
+                      aria-label="Action"
+                      id="filter-action"
+                      className="w-32 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                      placeholder="Action"
+                      value={filters.action}
+                      onChange={(event) => setFilter("action", event.target.value)}
+                    />
+                  </Form.Control>
+                </Form.Field>
 
-            <Form.Field name="status_code" className="text-sm">
-              <Form.Control asChild>
-                <input
-                  type="text"
-                  name="Status"
-                  aria-label="Status"
-                  id="filter-status"
-                  className="w-24 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
-                  placeholder="Status"
-                  value={filters.statusCode}
-                  onChange={(event) => setFilter("statusCode", event.target.value)}
-                />
-              </Form.Control>
-            </Form.Field>
+                <Form.Field name="status_code" className="text-sm">
+                  <Form.Control asChild>
+                    <input
+                      type="text"
+                      name="Status"
+                      aria-label="Status"
+                      id="filter-status"
+                      className="w-24 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                      placeholder="Status"
+                      value={filters.statusCode}
+                      onChange={(event) => setFilter("statusCode", event.target.value)}
+                    />
+                  </Form.Control>
+                </Form.Field>
 
-            <div>
-              <button
-                type="button"
-                className="rounded-md border border-(--border) bg-(--accent) px-3 py-1 text-sm text-(--textdark) hover:bg-(--accent)/70 transition-colors duration-300 ease-in-out"
-                onClick={() => {
-                  resetFilters();
-                }}
-              >
-                Reset
-              </button>
-            </div>
-          </Form.Root>
+                <div>
+                  <button
+                    type="button"
+                    className="rounded-md border border-(--border) bg-(--accent) px-3 py-1 text-sm text-(--textdark) hover:bg-(--accent)/70 transition-colors duration-300 ease-in-out"
+                    onClick={() => {
+                      resetFilters();
+                    }}
+                  >
+                    Reset
+                  </button>
+                </div>
+              </Form.Root>
+            </ScrollArea.Viewport>
+            <ScrollArea.Scrollbar
+              orientation="horizontal"
+              className="flex h-2.5 touch-none select-none bg-slate-900/50 p-0.5"
+            >
+              <ScrollArea.Thumb className="relative flex-1 rounded-full bg-slate-500/80 hover:bg-(--accent)" />
+            </ScrollArea.Scrollbar>
+            <ScrollArea.Corner className="bg-slate-900/50" />
+          </ScrollArea.Root>
         </section>
 
         <ScrollArea.Root className="relative mt-4 h-[500px] overflow-hidden">
@@ -418,7 +429,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           </ScrollArea.Scrollbar>
           <ScrollArea.Scrollbar
             orientation="horizontal"
-            className="flex h-2.5 touch-none select-none border-t border-(--border) bg-slate-900/50 p-0.5"
+            className="flex h-2.5 touch-none select-none bg-slate-900/50 p-0.5"
           >
             <ScrollArea.Thumb className="relative flex-1 rounded-full bg-slate-500/80 hover:bg-(--accent)" />
           </ScrollArea.Scrollbar>
