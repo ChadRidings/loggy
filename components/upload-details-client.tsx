@@ -412,7 +412,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
 
           <ScrollArea.Scrollbar
             orientation="vertical"
-            className="flex w-2.5 touch-none select-none border-l border-(--border) bg-slate-900/50 p-0.5"
+            className="flex w-2.5 touch-none select-none bg-slate-900/50 p-0.5"
           >
             <ScrollArea.Thumb className="relative flex-1 rounded-full bg-slate-500/80 hover:bg-(--accent)" />
           </ScrollArea.Scrollbar>
