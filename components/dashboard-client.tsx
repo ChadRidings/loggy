@@ -79,7 +79,9 @@ export function DashboardClient() {
     <div className="grid gap-6 sm:grid-cols-2">
       <section className="pt-6">
         <div className="rounded-2xl border border-(--border) bg-(--background)/50 p-6">
-          <h2 className="text-lg font-semibold text-white">Upload Log File</h2>
+          <h2 className="font-roboto-condensed text-xl font-semibold text-white">
+            Upload Log File
+          </h2>
           <p className="mt-1 text-sm">Supported files: .log or .txt (max 10MB)</p>
 
           <div className="mt-5 space-y-4">
@@ -167,7 +169,9 @@ export function DashboardClient() {
       </section>
 
       <section className="p-6">
-        <h2 className="text-lg font-semibold text-white">Upload History</h2>
+        <h2 className="font-roboto-condensed text-xl font-semibold text-white">
+          Upload History
+        </h2>
 
         {uploadsQuery.isLoading ? <p className="mt-4 text-sm">Loading uploads...</p> : null}
         {uploadsQuery.isError ? <p className="mt-4 text-sm">Failed to load uploads.</p> : null}

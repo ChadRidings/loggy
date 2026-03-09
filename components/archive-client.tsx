@@ -82,9 +82,19 @@ export function ArchiveClient() {
                     {new Date(upload.uploaded_at).toLocaleString()} ·{" "}
                     {(upload.raw_size_bytes / 1024).toFixed(1)} KB
                   </p>
+                  <p className="text-xs mt-1">Upload status: {upload.status}</p>
+                  {upload.failure_reason ? (
+                    <p className="mt-2 text-xs">{upload.failure_reason}</p>
+                  ) : null}
+
+                  <Link href={`/uploads/${upload.id}`} className="mt-3 inline-block">
+                    <span className="flex items-center text-sm text-(--accent) hover:text-white transition-colors duration-300 ease-in-out">
+                      View analysis
+                      <ThickArrowRightIcon className="ml-1" />
+                    </span>
+                  </Link>
                 </div>
                 <div className="flex items-center gap-2">
-                  <StatusBadge status={upload.status} />
                   <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
                       <button
@@ -116,15 +126,6 @@ export function ArchiveClient() {
                   </DropdownMenu.Root>
                 </div>
               </div>
-
-              {upload.failure_reason ? <p className="mt-2 text-xs">{upload.failure_reason}</p> : null}
-
-              <Link href={`/uploads/${upload.id}`} className="mt-3 inline-block">
-                <span className="flex items-center text-sm text-(--accent) hover:text-white transition-colors duration-300 ease-in-out">
-                  View analysis
-                  <ThickArrowRightIcon className="ml-1" />
-                </span>
-              </Link>
             </li>
           ))}
         </ul>

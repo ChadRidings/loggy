@@ -45,7 +45,9 @@ export default function LoginPage() {
         onSubmit={onSubmit}
         className="w-full rounded-2xl border border-(--border) bg-(--background) p-8"
       >
-        <h1 className="text-2xl font-semibold text-white">Welcome to Loggy</h1>
+        <h1 className="font-roboto-condensed text-2xl font-semibold text-lime-300">
+          Welcome to Loggy
+        </h1>
         <p className="mt-2 text-sm">Sign in with your credentials account.</p>
 
         <div className="mt-6 space-y-4">
@@ -81,7 +83,7 @@ export default function LoginPage() {
 
         <button
           type="submit"
-          className="mt-6 w-full rounded-lg bg-(--accent) px-4 py-2 font-medium text-white disabled:opacity-60"
+          className="mt-6 w-full rounded-lg bg-(--accent) px-4 py-2 text-(--textdark) disabled:opacity-60"
           disabled={loading}
         >
           {loading ? "Signing in..." : "Sign In"}

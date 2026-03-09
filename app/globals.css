@@ -40,3 +40,11 @@ a:hover {
   background-color: var(--background);
   background: linear-gradient(to bottom, #081722 0%, #081722 62%, #0a1823 100%);
 }
+
+.font-roboto-condensed {
+  font-family: var(--font-roboto-condensed), sans-serif;
+}
+
+.font-geostar-fill {
+  font-family: var(--font-geostar-fill), sans-serif;
+}

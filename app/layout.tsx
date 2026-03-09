@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { geostarFill, robotoCondensed } from "@/app/fonts";
 import { AppProviders } from "@/components/providers";
 
 export const metadata: Metadata = {
@@ -15,7 +16,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen">
+      <body
+        className={`min-h-screen ${robotoCondensed.variable} ${geostarFill.variable}`}
+      >
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

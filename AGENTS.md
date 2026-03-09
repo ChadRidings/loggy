@@ -55,8 +55,11 @@ This is an application built with utilizing the following tools: [React](https:/
 │   │   │   └── timeline
 │   │   │   └── route.ts
 │   │   └── route.ts
+│   ├── archive
+│   │   └── page.tsx
 │   ├── dashboard
 │   │   └── page.tsx
+│   ├── fonts.ts
 │   ├── globals.css
 │   ├── layout.tsx
 │   ├── login
@@ -67,8 +70,11 @@ This is an application built with utilizing the following tools: [React](https:/
 │   └── uploads
 │   └── [id]
 │   └── page.tsx
+├── archiving_plan.md
 ├── auth.ts
 ├── components
+│   ├── app-navigation.tsx
+│   ├── archive-client.tsx
 │   ├── dashboard-client.tsx
 │   ├── pagination-controls.tsx
 │   ├── providers.tsx

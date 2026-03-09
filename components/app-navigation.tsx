@@ -15,8 +15,9 @@ export function AppNavigation() {
   return (
     <div className="w-full border-b border-(--border) bg-(--background)/90">
       <div className="mx-auto w-full max-w-7xl px-6">
-        <NavigationMenu.Root className="w-full">
-          <NavigationMenu.List className="flex min-h-14 items-center gap-2">
+        <NavigationMenu.Root className="grid min-h-14 w-full grid-cols-[1fr_auto_1fr] items-center">
+          <span className="font-geostar-fill text-2xl leading-none text-lime-300">LOGGY</span>
+          <NavigationMenu.List className="flex items-center justify-center gap-2">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -26,8 +27,8 @@ export function AppNavigation() {
                       href={item.href}
                       className={`inline-flex rounded-md px-3 py-2 text-sm transition-colors ${
                         isActive
-                          ? "bg-(--accent) text-(--textdark)"
-                          : "text-(--textmain) hover:text-white"
+                          ? "bg-(--accent) text-(--textdark)!"
+                          : "text-(--textmain)! hover:text-white!"
                       }`}
                     >
                       {item.label}
@@ -37,6 +38,7 @@ export function AppNavigation() {
               );
             })}
           </NavigationMenu.List>
+          <div aria-hidden="true" />
         </NavigationMenu.Root>
       </div>
     </div>

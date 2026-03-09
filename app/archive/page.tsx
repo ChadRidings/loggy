@@ -14,7 +14,7 @@ export default async function ArchivePage() {
     <>
       <AppNavigation />
       <main className="mx-auto w-full max-w-7xl px-6 py-10">
-        <h1 className="text-2xl font-semibold text-white">Log Archive</h1>
+        <h1 className="font-roboto-condensed text-2xl font-semibold text-lime-300">Log Archive</h1>
         <p className="mt-1 text-sm mb-4">Signed in as {session.user.email}</p>
         <ArchiveClient />
       </main>
