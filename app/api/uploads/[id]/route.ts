@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { runMigrations } from "@/lib/db";
 import { requireApiUser } from "@/lib/auth-helpers";
-import { getUploadById } from "@/lib/uploads";
+import { deleteUploadById, getUploadById } from "@/lib/uploads";
 
 type Params = {
   params: Promise<{ id: string }>;
@@ -23,4 +23,22 @@ export async function GET(_: Request, { params }: Params) {
   }
 
   return NextResponse.json({ upload });
+}
+
+export async function DELETE(_: Request, { params }: Params) {
+  await runMigrations();
+
+  const authResult = await requireApiUser();
+  if (authResult.response) {
+    return authResult.response;
+  }
+
+  const { id } = await params;
+  const deleted = await deleteUploadById(authResult.userId, id);
+
+  if (!deleted) {
+    return NextResponse.json({ error: "Upload not found" }, { status: 404 });
+  }
+
+  return new NextResponse(null, { status: 204 });
 }

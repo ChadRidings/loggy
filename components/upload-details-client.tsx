@@ -215,7 +215,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
       <section>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-white">
+            <h1 className="text-2xl font-semibold text-lime-300">
               {uploadQuery.data?.filename ?? "Upload details"}
             </h1>
             <p className="mt-1 text-sm">
@@ -240,7 +240,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
 
       <section className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         <div className="p-0 lg:p-6">
-          <h2 className="text-lg font-semibold text-white">Timeline</h2>
+          <h2 className="font-roboto-condensed text-xl font-semibold text-white">Timeline</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {visibleTimelineItems.map((bucket) => (
               <li key={bucket.id} className="rounded-lg border border-(--border) p-3">
@@ -265,7 +265,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
         </div>
 
         <div className="p-0 lg:p-6">
-          <h2 className="text-lg font-semibold text-white">Anomalies</h2>
+          <h2 className="font-roboto-condensed text-xl font-semibold text-white">Anomalies</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {visibleAnomalyItems.map((anomaly) => (
               <li
