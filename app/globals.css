@@ -3,6 +3,7 @@
 :root {
   --background: #081722;
   --textmain: #a1bbcf;
+  --textdark: var(--color-slate-900);
   --white: #ffffff;
   --border: #2d3a43;
   --accent: #61d7e6;

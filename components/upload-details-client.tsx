@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Form, Separator } from "radix-ui";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Form, ScrollArea, Separator } from "radix-ui";
 import { useUploadUiStore } from "@/store/upload-ui-store";
 import { StatusBadge } from "@/components/status-badge";
 import { PaginationControls } from "@/components/pagination-controls";
@@ -59,9 +59,10 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
     useUploadUiStore();
   const queryClient = useQueryClient();
   const previousStatusRef = useRef<string | undefined>(undefined);
+  const eventsScrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const eventsScrollSentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const [eventRows, setEventRows] = useState<EventRecord[]>([]);
-  const [eventsPage, setEventsPage] = useState(1);
+  const [processingRefreshTick, setProcessingRefreshTick] = useState(0);
   const [timelinePage, setTimelinePage] = useState(1);
   const [anomalyPage, setAnomalyPage] = useState(1);
 
@@ -101,10 +102,12 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
     [filters]
   );
 
-  const eventsQuery = useQuery({
-    queryKey: ["events", uploadId, eventFilterParams],
-    queryFn: () => fetchEvents({ uploadId, cursor: null, filters: eventFilterParams }),
-    refetchInterval: isProcessing ? 3000 : false,
+  const eventsQuery = useInfiniteQuery({
+    queryKey: ["events", uploadId, eventFilterParams, processingRefreshTick],
+    queryFn: ({ pageParam }) =>
+      fetchEvents({ uploadId, cursor: pageParam, filters: eventFilterParams }),
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
 
   useEffect(() => {
@@ -127,13 +130,57 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   }, [queryClient, uploadId, uploadQuery.data?.status]);
 
   useEffect(() => {
-    if (!eventsQuery.data) {
+    if (!isProcessing) {
       return;
     }
 
-    setEventRows(eventsQuery.data.events);
-    setEventsPage(1);
-  }, [eventsQuery.data]);
+    const intervalId = window.setInterval(() => {
+      setProcessingRefreshTick((value) => value + 1);
+    }, 3000);
+
+    return () => window.clearInterval(intervalId);
+  }, [isProcessing]);
+
+  useEffect(() => {
+    const root = eventsScrollContainerRef.current;
+    const sentinel = eventsScrollSentinelRef.current;
+
+    if (!root || !sentinel) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const isIntersecting = entries.some((entry) => entry.isIntersecting);
+        if (!isIntersecting || !eventsQuery.hasNextPage || eventsQuery.isFetchingNextPage) {
+          return;
+        }
+        void eventsQuery.fetchNextPage();
+      },
+      {
+        root,
+        rootMargin: "200px 0px",
+      }
+    );
+
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, [
+    eventsQuery.fetchNextPage,
+    eventsQuery.hasNextPage,
+    eventsQuery.isFetchingNextPage,
+    eventsQuery.data?.pages.length,
+  ]);
+
+  useEffect(() => {
+    const root = eventsScrollContainerRef.current;
+    if (!root) {
+      return;
+    }
+
+    root.scrollTop = 0;
+  }, [eventFilterParams, processingRefreshTick]);
 
   useEffect(() => {
     setTimelinePage(1);
@@ -158,11 +205,9 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
     anomalyPage * pageSize
   );
 
-  const eventsPageSize = 15;
-  const eventsTotalPages = Math.max(1, Math.ceil(eventRows.length / eventsPageSize));
-  const visibleEventRows = eventRows.slice(
-    (eventsPage - 1) * eventsPageSize,
-    eventsPage * eventsPageSize
+  const eventRows = useMemo(
+    () => eventsQuery.data?.pages.flatMap((page) => page.events) ?? [],
+    [eventsQuery.data]
   );
 
   return (
@@ -193,8 +238,8 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
 
       <Separator.Root className="h-px bg-slate-700/40" />
 
-      <section className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-2xl border border-(--border) bg-(--background) p-6">
+      <section className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+        <div className="p-0 lg:p-6">
           <h2 className="text-lg font-semibold text-white">Timeline</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {visibleTimelineItems.map((bucket) => (
@@ -219,7 +264,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           />
         </div>
 
-        <div className="rounded-2xl border border-(--border) bg-(--background) p-6">
+        <div className="p-0 lg:p-6">
           <h2 className="text-lg font-semibold text-white">Anomalies</h2>
           <ul className="mt-4 space-y-2 text-sm">
             {visibleAnomalyItems.map((anomaly) => (
@@ -230,7 +275,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
               >
                 <div className="flex items-center justify-between gap-2">
                   <p className="font-medium">{anomaly.type}</p>
-                  <span className="rounded-full bg-(--accent) px-2 py-1 text-xs text-white">
+                  <span className="rounded-full bg-(--accent) px-2 py-1 text-xs text-(--textdark)">
                     {Number(anomaly.confidence_score).toFixed(2)} / 10
                   </span>
                 </div>
@@ -253,97 +298,132 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-(--border) bg-(--background) p-6">
-        <Form.Root className="flex flex-wrap items-end gap-3">
-          <Form.Field name="src_ip" className="text-sm">
-            <Form.Label htmlFor="filter-src-ip">Source IP</Form.Label>
-            <Form.Control asChild>
-              <input
-                id="filter-src-ip"
-                className="mt-1 w-36 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
-                value={filters.srcIp}
-                onChange={(event) => setFilter("srcIp", event.target.value)}
-              />
-            </Form.Control>
-          </Form.Field>
-          <Form.Field name="domain" className="text-sm">
-            <Form.Label htmlFor="filter-domain">Domain</Form.Label>
-            <Form.Control asChild>
-              <input
-                id="filter-domain"
-                className="mt-1 w-44 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
-                value={filters.domain}
-                onChange={(event) => setFilter("domain", event.target.value)}
-              />
-            </Form.Control>
-          </Form.Field>
-          <Form.Field name="action" className="text-sm">
-            <Form.Label htmlFor="filter-action">Action</Form.Label>
-            <Form.Control asChild>
-              <input
-                id="filter-action"
-                className="mt-1 w-32 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
-                value={filters.action}
-                onChange={(event) => setFilter("action", event.target.value)}
-              />
-            </Form.Control>
-          </Form.Field>
-          <Form.Field name="status_code" className="text-sm">
-            <Form.Label htmlFor="filter-status">Status</Form.Label>
-            <Form.Control asChild>
-              <input
-                id="filter-status"
-                className="mt-1 w-24 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
-                value={filters.statusCode}
-                onChange={(event) => setFilter("statusCode", event.target.value)}
-              />
-            </Form.Control>
-          </Form.Field>
-          <button
-            type="button"
-            className="rounded-lg border border-(--border) px-3 py-2 text-sm"
-            onClick={() => void eventsQuery.refetch()}
-          >
-            Apply Filters
-          </button>
-          <button
-            type="button"
-            className="rounded-lg border border-(--border) px-3 py-2 text-sm"
-            onClick={() => {
-              resetFilters();
-              void eventsQuery.refetch();
-            }}
-          >
-            Reset
-          </button>
-        </Form.Root>
+      <section className="rounded-2xl border border-(--border) bg-(--background)/50 p-6">
+        <section className="border-b border-(--border) pb-4 overflow-auto">
+          <Form.Root className="flex items-center justify-start gap-3">
+            <div className="text-white text-sm">Filter By:</div>
+            <Form.Field name="src_ip" className="text-sm">
+              <Form.Control asChild>
+                <input
+                  type="text"
+                  name="Source IP"
+                  aria-label="Source IP"
+                  id="filter-src-ip"
+                  className="w-36 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                  placeholder="Source IP"
+                  value={filters.srcIp}
+                  onChange={(event) => setFilter("srcIp", event.target.value)}
+                />
+              </Form.Control>
+            </Form.Field>
 
-        <div className="mt-4 overflow-x-auto linear-bg">
-          <table className="w-full min-w-[720px] border-collapse text-sm">
-            <thead>
-              <tr className="border-b border-(--border) text-left">
-                <th className="pb-2">Timestamp</th>
-                <th className="pb-2">IP</th>
-                <th className="pb-2">Domain</th>
-                <th className="pb-2">Action</th>
-                <th className="pb-2">Status</th>
-                <th className="pb-2">Severity</th>
-              </tr>
-            </thead>
-            <tbody>
-              {visibleEventRows.map((event) => (
-                <tr key={event.id} className="border-b border-(--border)">
-                  <td className="py-2 pr-2">{new Date(event.timestamp).toLocaleString()}</td>
-                  <td className="py-2 pr-2">{event.src_ip ?? "-"}</td>
-                  <td className="py-2 pr-2">{event.domain ?? "-"}</td>
-                  <td className="py-2 pr-2">{event.action ?? "-"}</td>
-                  <td className="py-2 pr-2">{event.status_code ?? "-"}</td>
-                  <td className="py-2 pr-2">{event.severity ?? "-"}</td>
+            <Form.Field name="domain" className="text-sm">
+              <Form.Control asChild>
+                <input
+                  type="text"
+                  name="Domain"
+                  aria-label="Domain"
+                  id="filter-domain"
+                  className="w-44 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                  placeholder="Domain"
+                  value={filters.domain}
+                  onChange={(event) => setFilter("domain", event.target.value)}
+                />
+              </Form.Control>
+            </Form.Field>
+
+            <Form.Field name="action" className="text-sm">
+              <Form.Control asChild>
+                <input
+                  type="text"
+                  name="Action"
+                  aria-label="Action"
+                  id="filter-action"
+                  className="w-32 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                  placeholder="Action"
+                  value={filters.action}
+                  onChange={(event) => setFilter("action", event.target.value)}
+                />
+              </Form.Control>
+            </Form.Field>
+
+            <Form.Field name="status_code" className="text-sm">
+              <Form.Control asChild>
+                <input
+                  type="text"
+                  name="Status"
+                  aria-label="Status"
+                  id="filter-status"
+                  className="w-24 rounded-lg border border-(--border) px-2 py-1 text-slate-200"
+                  placeholder="Status"
+                  value={filters.statusCode}
+                  onChange={(event) => setFilter("statusCode", event.target.value)}
+                />
+              </Form.Control>
+            </Form.Field>
+
+            <div>
+              <button
+                type="button"
+                className="rounded-md border border-(--border) bg-(--accent) px-3 py-1 text-sm text-(--textdark) hover:bg-(--accent)/70 transition-colors duration-300 ease-in-out"
+                onClick={() => {
+                  resetFilters();
+                }}
+              >
+                Reset
+              </button>
+            </div>
+          </Form.Root>
+        </section>
+
+        <ScrollArea.Root className="relative mt-4 h-[500px] overflow-hidden">
+          <ScrollArea.Viewport ref={eventsScrollContainerRef} className="h-full w-full">
+            <table className="w-full min-w-180 border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-(--border) text-left">
+                  <th className="pb-2">Timestamp</th>
+                  <th className="pb-2">IP</th>
+                  <th className="pb-2">Domain</th>
+                  <th className="pb-2">Action</th>
+                  <th className="pb-2">Status</th>
+                  <th className="pb-2">Severity</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {eventRows.map((event) => (
+                  <tr key={event.id} className="border-b border-(--border)">
+                    <td className="py-2 pr-2">{new Date(event.timestamp).toLocaleString()}</td>
+                    <td className="py-2 pr-2">{event.src_ip ?? "-"}</td>
+                    <td className="py-2 pr-2">{event.domain ?? "-"}</td>
+                    <td className="py-2 pr-2">{event.action ?? "-"}</td>
+                    <td className="py-2 pr-2">{event.status_code ?? "-"}</td>
+                    <td className="py-2 pr-2">{event.severity ?? "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div ref={eventsScrollSentinelRef} className="h-4" aria-hidden="true" />
+            {eventsQuery.isFetchingNextPage ? (
+              <div className="sticky bottom-0 px-2 py-2 text-center text-sm bg-(--background)/85 backdrop-blur-xs">
+                Loading more events...
+              </div>
+            ) : null}
+          </ScrollArea.Viewport>
+
+          <ScrollArea.Scrollbar
+            orientation="vertical"
+            className="flex w-2.5 touch-none select-none bg-slate-900/50 p-0.5"
+          >
+            <ScrollArea.Thumb className="relative flex-1 rounded-full bg-slate-500/80 hover:bg-(--accent)" />
+          </ScrollArea.Scrollbar>
+          <ScrollArea.Scrollbar
+            orientation="horizontal"
+            className="flex h-2.5 touch-none select-none border-t border-(--border) bg-slate-900/50 p-0.5"
+          >
+            <ScrollArea.Thumb className="relative flex-1 rounded-full bg-slate-500/80 hover:bg-(--accent)" />
+          </ScrollArea.Scrollbar>
+          <ScrollArea.Corner className="bg-slate-900/50" />
+        </ScrollArea.Root>
 
         {eventsQuery.isLoading && eventRows.length === 0 ? (
           <p className="mt-3 text-sm">Loading events...</p>
@@ -352,14 +432,6 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
         {!eventsQuery.isLoading && eventRows.length === 0 ? (
           <p className="mt-3 text-sm">No events found.</p>
         ) : null}
-
-        <PaginationControls
-          currentPage={eventsPage}
-          totalPages={eventsTotalPages}
-          onPageChange={setEventsPage}
-          ariaLabel="Events pagination"
-          className="mt-4 flex items-center justify-between text-xs"
-        />
       </section>
     </div>
   );
