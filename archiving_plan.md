@@ -9,6 +9,9 @@ Implement archive behavior by recency emphasis: the 5 newest uploads are highlig
 - **Navigation**
   - Add a shared Radix `NavigationMenu` for authenticated app pages with links: `Dashboard` (`/dashboard`) and `Archive` (`/archive`).
   - Show active-state styling based on current pathname.
+  - Navigation belongs at the top of the page, first item.
+  - Navigation should be full browser width.
+  - Navigation should be anchored to the top with no padding above.
 - **Archive behavior**
   - Keep upload ordering by `uploaded_at DESC`.
   - Dashboard Upload History renders only `uploads.slice(0, 5)`.
