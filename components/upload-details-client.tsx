@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Form, Separator } from "radix-ui";
+import { Form, ScrollArea, Separator } from "radix-ui";
 import { useUploadUiStore } from "@/store/upload-ui-store";
 import { StatusBadge } from "@/components/status-badge";
 import { PaginationControls } from "@/components/pagination-controls";
@@ -298,7 +298,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-(--border) bg-(--background) p-6">
+      <section className="rounded-2xl border border-(--border) bg-(--background)/50 p-6">
         <section className="border-b border-(--border) pb-4">
           <Form.Root className="flex items-center justify-start gap-3">
             <div className="text-white text-sm">Filter By:</div>
@@ -376,33 +376,54 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
           </Form.Root>
         </section>
 
-        <div ref={eventsScrollContainerRef} className="mt-4 h-[500px] overflow-auto">
-          <table className="w-full min-w-180 border-collapse text-sm">
-            <thead>
-              <tr className="border-b border-(--border) text-left">
-                <th className="pb-2">Timestamp</th>
-                <th className="pb-2">IP</th>
-                <th className="pb-2">Domain</th>
-                <th className="pb-2">Action</th>
-                <th className="pb-2">Status</th>
-                <th className="pb-2">Severity</th>
-              </tr>
-            </thead>
-            <tbody>
-              {eventRows.map((event) => (
-                <tr key={event.id} className="border-b border-(--border)">
-                  <td className="py-2 pr-2">{new Date(event.timestamp).toLocaleString()}</td>
-                  <td className="py-2 pr-2">{event.src_ip ?? "-"}</td>
-                  <td className="py-2 pr-2">{event.domain ?? "-"}</td>
-                  <td className="py-2 pr-2">{event.action ?? "-"}</td>
-                  <td className="py-2 pr-2">{event.status_code ?? "-"}</td>
-                  <td className="py-2 pr-2">{event.severity ?? "-"}</td>
+        <ScrollArea.Root className="relative mt-4 h-[500px] overflow-hidden">
+          <ScrollArea.Viewport ref={eventsScrollContainerRef} className="h-full w-full">
+            <table className="w-full min-w-180 border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-(--border) text-left">
+                  <th className="pb-2">Timestamp</th>
+                  <th className="pb-2">IP</th>
+                  <th className="pb-2">Domain</th>
+                  <th className="pb-2">Action</th>
+                  <th className="pb-2">Status</th>
+                  <th className="pb-2">Severity</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <div ref={eventsScrollSentinelRef} className="h-4" aria-hidden="true" />
-        </div>
+              </thead>
+              <tbody>
+                {eventRows.map((event) => (
+                  <tr key={event.id} className="border-b border-(--border)">
+                    <td className="py-2 pr-2">{new Date(event.timestamp).toLocaleString()}</td>
+                    <td className="py-2 pr-2">{event.src_ip ?? "-"}</td>
+                    <td className="py-2 pr-2">{event.domain ?? "-"}</td>
+                    <td className="py-2 pr-2">{event.action ?? "-"}</td>
+                    <td className="py-2 pr-2">{event.status_code ?? "-"}</td>
+                    <td className="py-2 pr-2">{event.severity ?? "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div ref={eventsScrollSentinelRef} className="h-4" aria-hidden="true" />
+            {eventsQuery.isFetchingNextPage ? (
+              <div className="sticky bottom-0 px-2 py-2 text-center text-sm bg-(--background)/85 backdrop-blur-xs">
+                Loading more events...
+              </div>
+            ) : null}
+          </ScrollArea.Viewport>
+
+          <ScrollArea.Scrollbar
+            orientation="vertical"
+            className="flex w-2.5 touch-none select-none border-l border-(--border) bg-slate-900/50 p-0.5"
+          >
+            <ScrollArea.Thumb className="relative flex-1 rounded-full bg-slate-500/80 hover:bg-(--accent)" />
+          </ScrollArea.Scrollbar>
+          <ScrollArea.Scrollbar
+            orientation="horizontal"
+            className="flex h-2.5 touch-none select-none border-t border-(--border) bg-slate-900/50 p-0.5"
+          >
+            <ScrollArea.Thumb className="relative flex-1 rounded-full bg-slate-500/80 hover:bg-(--accent)" />
+          </ScrollArea.Scrollbar>
+          <ScrollArea.Corner className="bg-slate-900/50" />
+        </ScrollArea.Root>
 
         {eventsQuery.isLoading && eventRows.length === 0 ? (
           <p className="mt-3 text-sm">Loading events...</p>
@@ -410,9 +431,6 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
         {eventsQuery.isError ? <p className="mt-3 text-sm">Failed to load events.</p> : null}
         {!eventsQuery.isLoading && eventRows.length === 0 ? (
           <p className="mt-3 text-sm">No events found.</p>
-        ) : null}
-        {eventsQuery.isFetchingNextPage ? (
-          <p className="mt-3 text-sm">Loading more events...</p>
         ) : null}
       </section>
     </div>
