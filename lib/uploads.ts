@@ -236,3 +236,15 @@ export async function getUploadById(userId: string, uploadId: string): Promise<U
 
   return result.rows[0] ?? null;
 }
+
+export async function deleteUploadById(userId: string, uploadId: string): Promise<boolean> {
+  const result = await query(
+    `
+      DELETE FROM uploads
+      WHERE id = $1 AND user_id = $2
+    `,
+    [uploadId, userId]
+  );
+
+  return (result.rowCount ?? 0) > 0;
+}
