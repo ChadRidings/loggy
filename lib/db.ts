@@ -111,6 +111,18 @@ export async function runMigrations(): Promise<void> {
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
 
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT 1
+          FROM information_schema.columns
+          WHERE table_name = 'anomalies'
+            AND column_name = 'label'
+        ) THEN
+          ALTER TABLE anomalies ALTER COLUMN label DROP NOT NULL;
+        END IF;
+      END $$;
+
       CREATE INDEX IF NOT EXISTS idx_events_upload_timestamp_id
         ON events(upload_id, timestamp DESC, id DESC);
       CREATE INDEX IF NOT EXISTS idx_events_upload_src_ip
