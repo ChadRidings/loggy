@@ -63,7 +63,6 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   const eventsScrollContainerRef = useRef<HTMLDivElement | null>(null);
   const eventsScrollSentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const [processingRefreshTick, setProcessingRefreshTick] = useState(0);
   const [timelinePage, setTimelinePage] = useState(1);
   const [anomalyPage, setAnomalyPage] = useState(1);
 
@@ -83,12 +82,14 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
     queryKey: ["timeline", uploadId],
     queryFn: () => fetchTimeline(uploadId),
     refetchInterval: isProcessing ? 3000 : false,
+    placeholderData: (previousData) => previousData,
   });
 
   const anomalyQuery = useQuery({
     queryKey: ["anomalies", uploadId],
     queryFn: () => fetchAnomalies(uploadId),
     refetchInterval: isProcessing ? 3000 : false,
+    placeholderData: (previousData) => previousData,
   });
 
   const eventFilterParams = useMemo(
@@ -104,11 +105,13 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   );
 
   const eventsQuery = useInfiniteQuery({
-    queryKey: ["events", uploadId, eventFilterParams, processingRefreshTick],
+    queryKey: ["events", uploadId, eventFilterParams],
     queryFn: ({ pageParam }) =>
       fetchEvents({ uploadId, cursor: pageParam, filters: eventFilterParams }),
     initialPageParam: null as string | null,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
+    refetchInterval: isProcessing ? 3000 : false,
+    placeholderData: (previousData) => previousData,
   });
 
   useEffect(() => {
@@ -129,18 +132,6 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
 
     previousStatusRef.current = currentStatus;
   }, [queryClient, uploadId, uploadQuery.data?.status]);
-
-  useEffect(() => {
-    if (!isProcessing) {
-      return;
-    }
-
-    const intervalId = window.setInterval(() => {
-      setProcessingRefreshTick((value) => value + 1);
-    }, 3000);
-
-    return () => window.clearInterval(intervalId);
-  }, [isProcessing]);
 
   useEffect(() => {
     const root = eventsScrollContainerRef.current;
@@ -181,7 +172,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
     }
 
     root.scrollTop = 0;
-  }, [eventFilterParams, processingRefreshTick]);
+  }, [eventFilterParams]);
 
   useEffect(() => {
     setTimelinePage(1);
