@@ -135,7 +135,7 @@ Purpose:
 - `markUploadFailed(uploadId, reason)`: marks upload/job failed state and persists error context.
 
 ### Event and derived data writes
-- `insertEvents(uploadId, events)`: row-by-row insert of parsed events.
+- `insertEvents(uploadId, events)`: chunked multi-row `INSERT` batches (current batch size: 500 events per query).
 - `replaceTimelines(uploadId, buckets)`: delete-then-reinsert strategy for full timeline refresh per upload.
 - `replaceAnomalies(uploadId, anomalies)`: delete-then-reinsert strategy for full anomaly refresh per upload.
 
@@ -170,17 +170,19 @@ Purpose:
 ## End-to-End Write Flow (Upload to Persisted Results)
 
 1. Create upload + ingestion job rows (`queued`).
-2. Transition upload/job to `processing`.
-3. Insert parsed event rows.
-4. Replace timeline aggregates for that upload.
-5. Replace anomalies for that upload.
-6. Mark upload/job as `completed` or `partial_success`; on exception, `failed`.
+2. Return `202 Accepted`, then schedule ingestion after the response via `after(...)` in `POST /api/uploads`.
+3. Transition upload/job to `processing`.
+4. Insert parsed event rows.
+5. Replace timeline aggregates for that upload.
+6. Replace anomalies for that upload.
+7. Mark upload/job as `completed` or `partial_success`; on exception, `failed`.
 
 ## Consistency and Transaction Notes
 
 - Multi-step ingestion writes are not wrapped in a single SQL transaction.
 - As a result, partial intermediate states are possible (for example: events written but timelines/anomalies not yet replaced) until final status transition.
 - The app mitigates duplicate in-process work per upload using an in-memory `inFlightJobs` set.
+- Ingestion currently runs asynchronously in-process after the upload route responds; this keeps request latency low while status is tracked in `uploads`/`ingestion_jobs`.
 
 ## Data Access and Isolation Model
 
@@ -191,6 +193,7 @@ Purpose:
 ## Operational Notes for DB Engineers
 
 - Runtime migrations are convenient for local/dev but provide limited migration history/auditability versus versioned migrations.
-- `insertEvents` currently inserts one row per statement; bulk insert/COPY would improve throughput for larger files.
+- `insertEvents` uses chunked multi-row inserts (batch size 500), which reduces database round-trips for larger files.
 - `replaceTimelines` and `replaceAnomalies` use full replacement semantics (delete + reinsert), favoring simplicity over incremental updates.
 - `events.raw_line_expires_at` is written but no cleanup job is defined in the current codebase.
+- For Vercel + Neon deployments, use a pooled `DATABASE_URL` with SSL (`sslmode=require`) to avoid connection exhaustion and TLS issues.
