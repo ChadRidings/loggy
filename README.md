@@ -74,6 +74,8 @@ OPENAI_MODEL=gpt-4.1-mini
 
 ## AI Usage
 
+For a full end-to-end walkthrough, see [how_ai_works.md](./how_ai_works.md).
+
 ### Where AI is used
 
 AI is used only in anomaly enrichment/classification, not in log parsing.

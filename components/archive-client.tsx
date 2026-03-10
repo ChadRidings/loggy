@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   CalendarIcon,
   DotsHorizontalIcon,
@@ -10,7 +10,7 @@ import {
   TrashIcon,
 } from "@radix-ui/react-icons";
 import { AlertDialog, DropdownMenu } from "radix-ui";
-import { StatusBadge } from "@/components/status-badge";
+import { PaginationControls } from "@/components/pagination-controls";
 import type { UploadRecord } from "@/types/loggy";
 
 async function fetchUploads(): Promise<UploadRecord[]> {
@@ -35,7 +35,9 @@ async function deleteUpload(uploadId: string): Promise<void> {
 }
 
 export function ArchiveClient() {
+  const pageSize = 10;
   const queryClient = useQueryClient();
+  const [currentPage, setCurrentPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<UploadRecord | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
@@ -57,6 +59,18 @@ export function ArchiveClient() {
   });
 
   const uploads = uploadsQuery.data ?? [];
+  const totalPages = Math.max(1, Math.ceil(uploads.length / pageSize));
+  const visibleUploads = uploads.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [uploadsQuery.data]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   return (
     <section className="p-6">
@@ -72,7 +86,7 @@ export function ArchiveClient() {
 
       {uploads.length > 0 ? (
         <ul className="mt-4 space-y-3">
-          {uploads.map((upload) => (
+          {visibleUploads.map((upload) => (
             <li key={upload.id} className="rounded-xl border border-(--border) p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
@@ -130,6 +144,13 @@ export function ArchiveClient() {
           ))}
         </ul>
       ) : null}
+
+      <PaginationControls
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        ariaLabel="Archive pagination"
+      />
 
       <AlertDialog.Root
         open={Boolean(deleteTarget)}

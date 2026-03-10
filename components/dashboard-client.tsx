@@ -170,7 +170,7 @@ export function DashboardClient() {
 
       <section className="p-6">
         <h2 className="font-roboto-condensed text-xl font-semibold text-white">
-          Upload History
+          Recent Upload History
         </h2>
 
         {uploadsQuery.isLoading ? <p className="mt-4 text-sm">Loading uploads...</p> : null}
