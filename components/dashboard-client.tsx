@@ -77,7 +77,7 @@ export function DashboardClient() {
 
   return (
     <div className="grid gap-6 sm:grid-cols-2">
-      <section className="pt-6">
+      <section className="p-6">
         <div className="rounded-2xl border border-(--border) bg-(--background)/50 p-6">
           <h2 className="font-roboto-condensed text-xl font-semibold text-white">
             Upload Log File
@@ -170,7 +170,7 @@ export function DashboardClient() {
 
       <section className="p-6">
         <h2 className="font-roboto-condensed text-xl font-semibold text-white">
-          Upload History
+          Recent Upload History
         </h2>
 
         {uploadsQuery.isLoading ? <p className="mt-4 text-sm">Loading uploads...</p> : null}

@@ -6,6 +6,7 @@ import { Form, ScrollArea, Separator } from "radix-ui";
 import { useUploadUiStore } from "@/store/upload-ui-store";
 import { StatusBadge } from "@/components/status-badge";
 import { PaginationControls } from "@/components/pagination-controls";
+import { formatAnomalyType } from "@/lib/anomaly-labels";
 import type { AnomalyRecord, EventRecord, TimelineRecord, UploadRecord } from "@/types/loggy";
 
 async function fetchUpload(uploadId: string): Promise<UploadRecord> {
@@ -274,7 +275,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
                 onClick={() => setSelectedAnomalyId(anomaly.id)}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <p className="font-medium">{anomaly.type}</p>
+                  <p className="font-medium">{formatAnomalyType(anomaly.type)}</p>
                   <span className="rounded-full bg-(--accent) px-2 py-1 text-xs text-(--textdark)">
                     {Number(anomaly.confidence_score).toFixed(2)} / 10
                   </span>

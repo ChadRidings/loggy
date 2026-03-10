@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { NavigationMenu } from "radix-ui";
 
 const navItems = [
@@ -15,7 +16,7 @@ export function AppNavigation() {
   return (
     <div className="w-full border-b border-(--border) bg-(--background)/90">
       <div className="mx-auto w-full max-w-7xl px-6">
-        <NavigationMenu.Root className="grid min-h-14 w-full grid-cols-[1fr_auto_1fr] items-center">
+        <NavigationMenu.Root className="grid min-h-14 w-full grid-cols-[1fr_auto_1fr] items-center justify-self-start">
           <span className="font-geostar-fill text-2xl leading-none text-lime-300">LOGGY</span>
           <NavigationMenu.List className="flex items-center justify-center gap-2">
             {navItems.map((item) => {
@@ -38,7 +39,15 @@ export function AppNavigation() {
               );
             })}
           </NavigationMenu.List>
-          <div aria-hidden="true" />
+          <div className="justify-self-end">
+            <button
+              type="button"
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="inline-flex text-sm text-(--textmain) transition-colors hover:text-white"
+            >
+              Sign out
+            </button>
+          </div>
         </NavigationMenu.Root>
       </div>
     </div>

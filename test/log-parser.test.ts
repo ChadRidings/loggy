@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parseLogContent } from "@/lib/parser/log-parser";
 
 describe("parseLogContent", () => {
+  // Verifies valid Zscaler-style CSV lines are parsed into normalized events with derived fields like severity and domain.
   it("parses zscaler-like csv lines", () => {
     const content = [
       "2026-03-05T10:00:00Z,10.0.0.1,https://example.com,ALLOW,200,alice,GET,123,Mozilla",
@@ -16,6 +17,7 @@ describe("parseLogContent", () => {
     expect(result.events[0]?.domain).toBe("example.com");
   });
 
+  // Ensures unknown line formats are rejected as events and captured as parse warnings.
   it("returns warnings for unrecognized lines", () => {
     const content = "not parseable line";
     const result = parseLogContent(content);

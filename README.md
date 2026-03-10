@@ -1,6 +1,6 @@
 # Loggy
 
-Loggy is a full-stack cybersecurity log analysis app built with Next.js, PostgreSQL, NextAuth, TanStack Query, and Zustand.
+Loggy is a full-stack cybersecurity log analysis platform that lets authenticated users upload raw `.log` and `.txt` network/security logs, process them through an asynchronous ingestion pipeline, normalize and store events in PostgreSQL, and review timeline, anomaly, and filtered event insights through a responsive Next.js dashboard with optional LLM-assisted anomaly enrichment.
 
 ## Features
 
@@ -14,13 +14,19 @@ Loggy is a full-stack cybersecurity log analysis app built with Next.js, Postgre
 
 ## Tech Stack
 
-- Next.js 16 + React 19 + TypeScript
-- NextAuth (credentials)
-- PostgreSQL + `pg`
-- Zod validation
-- TanStack Query + Zustand
-- Tailwind CSS
-- Vitest
+- **Framework**: NEXT.js 16 (App Router) + React 19
+- **UI**: Radix UI
+- **Language**: TypeScript
+- **CSS**: Tailwind CSS 4
+- **State Management**: Zustand
+- **Authentication**: NextAuth.js
+- **Password Security**: bcryptjs
+- **Typechecking**: TypeScript (`tsc --noEmit`)
+- **Validation**: Zod
+- **Caching**: TanStack Query (+ React Query Devtools for local debugging)
+- **Database**: PostgreSQL via `pg`
+- **Testing**: Vitest
+- **Linting**: ESLint + Prettier
 
 ## Local Setup
 
@@ -52,6 +58,14 @@ cp .env.example .env.local
 npm run dev
 ```
 
+4. (Optional) Verify local setup:
+
+```bash
+npm run typecheck
+npm run test
+npm run lint
+```
+
 ## Environment Variables
 
 Use `.env.local`:
@@ -67,6 +81,8 @@ OPENAI_MODEL=gpt-4.1-mini
 ```
 
 ## AI Usage
+
+For a full end-to-end walkthrough, see [how_ai_works.md](./documentation/how_ai_works.md).
 
 ### Where AI is used
 
@@ -106,6 +122,7 @@ If `ENABLE_LLM_ANOMALY=false`, `OPENAI_API_KEY` is unset, or the LLM call fails:
 - `POST /api/uploads` (returns `202`)
 - `GET /api/uploads`
 - `GET /api/uploads/:id`
+- `DELETE /api/uploads/:id`
 - `GET /api/uploads/:id/events` (cursor pagination)
 - `GET /api/uploads/:id/timeline`
 - `GET /api/uploads/:id/anomalies`
@@ -118,7 +135,13 @@ npm run build
 npm run start
 npm run test
 npm run typecheck
+npm run lint
 ```
+
+## Database
+
+For a DB-engineering-focused schema/query guide,
+see [how_db_works.md](./documentation/how_db_works.md).
 
 ## Example Logs
 
@@ -132,3 +155,9 @@ Sample logs are in:
 
 - Database schema is auto-bootstrapped by migration logic on first DB-backed request.
 - LLM enrichment is feature-flagged and optional for local development.
+- For a DB-engineering-focused schema/query guide, see [how_db_works.md](./documentation/how_db_works.md).
+
+## Implementation Plans
+
+- Implementation plan is [implementation-plans/plan.md](./implementation-plans/plan.md).
+- Archiving plan is [implementation-plans/archiving_plan.md](./implementation-plans/archiving_plan.md).

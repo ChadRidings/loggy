@@ -70,7 +70,6 @@ This is an application built with utilizing the following tools: [React](https:/
 │   └── uploads
 │   └── [id]
 │   └── page.tsx
-├── archiving_plan.md
 ├── auth.ts
 ├── components
 │   ├── app-navigation.tsx
@@ -82,12 +81,19 @@ This is an application built with utilizing the following tools: [React](https:/
 │   └── upload-details-client.tsx
 ├── docker-compose.yml
 ├── Dockerfile
+├── documentation
+│   ├── how_ai_works.md
+│   └── how_db_works.md
 ├── eslint.config.mjs
 ├── examples
 │   ├── zscaler-sample.log
 │   ├── zscaler-sample2.log
 │   └── zscaler-sample3.log
+├── implementation-plans
+│   ├── archiving_plan.md
+│   └── plan.md
 ├── lib
+│   ├── anomaly-labels.ts
 │   ├── anomaly.ts
 │   ├── auth-helpers.ts
 │   ├── db.ts
@@ -100,13 +106,15 @@ This is an application built with utilizing the following tools: [React](https:/
 ├── next.config.ts
 ├── package-lock.json
 ├── package.json
-├── plan.md
 ├── postcss.config.mjs
 ├── README.md
 ├── store
 │   └── upload-ui-store.ts
 ├── test
 │   ├── anomaly.test.ts
+│   ├── auth-helpers.test.ts
+│   ├── auth-options.test.ts
+│   ├── auth-register-route.test.ts
 │   └── log-parser.test.ts
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo
@@ -119,7 +127,10 @@ This is an application built with utilizing the following tools: [React](https:/
 
 - Operate as a high-level Staff Engineer and treat every task with a high-level of rigor.
 - Always check package.json for version numbers before using logic.
-- Always give PR summaries in .md format.
+- Always check `AGENTS.md` for project constraints.
+- Ensure integrity of answers by using official documentation linked in `AGENTS.md` as a reference point.
+- Always give PR summaries in `.md` format.
+- Never share values in the `.env` files publicly.
 
 ## Dependencies
 
