@@ -69,14 +69,22 @@ npm run lint
 ## Environment Variables
 
 Use `.env.local`:
+I've included `.env.example` for reference.
 
 ```bash
+# App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Auth.js
 NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=replace-with-random-secret
+NEXTAUTH_SECRET=change-me-to-a-long-random-string
+
+# PostgreSQL
 DATABASE_URL=postgres://loggy:loggy@localhost:5432/loggy
+
+# LLM anomaly enrichment (optional)
 ENABLE_LLM_ANOMALY=false
-OPENAI_API_KEY=
+OPENAI_API_KEY=add-your-openai-api-key-here
 OPENAI_MODEL=gpt-4.1-mini
 ```
 
@@ -152,8 +160,8 @@ Setup guide: [deployment_vercel_neon.md](./documentation/deployment_vercel_neon.
 
 ### Live Demo
 
-- URL: `https://loggy-theta.vercel.app/`
-- Users can register a new account from `/register`.
+- URL: [https://loggy-theta.vercel.app/](https://loggy-theta.vercel.app/)
+- Users can register a new account from [/register](https://loggy-theta.vercel.app/register).
 
 ## Database
 

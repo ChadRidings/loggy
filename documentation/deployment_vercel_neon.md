@@ -55,9 +55,3 @@ npm run build
 3. Upload a sample file from `examples/`.
 4. Upload details page shows events, timeline, anomalies.
 5. Logout/login roundtrip works.
-
-## 6) Interview Demo Readiness Checklist
-
-- Add the live URL to [`README.md`](../README.md).
-- Optionally add temporary credentials in README.
-- Keep LLM enrichment off (`ENABLE_LLM_ANOMALY=false`) to avoid external API cost.
