@@ -80,6 +80,8 @@ OPENAI_API_KEY=
 OPENAI_MODEL=gpt-4.1-mini
 ```
 
+For production hosting on Vercel + Neon, see [deployment_vercel_neon.md](./documentation/deployment_vercel_neon.md).
+
 ## AI Usage
 
 For a full end-to-end walkthrough, see [how_ai_works.md](./documentation/how_ai_works.md).
@@ -138,6 +140,21 @@ npm run typecheck
 npm run lint
 ```
 
+## Deployment (Free Tier)
+
+Recommended stack for this project:
+
+- GitHub repository (public for easiest reviewer access)
+- Vercel (web hosting, free tier)
+- Neon Postgres (database, free tier)
+
+Setup guide: [deployment_vercel_neon.md](./documentation/deployment_vercel_neon.md)
+
+### Live Demo
+
+- URL: `https://loggy-theta.vercel.app/`
+- Users can register a new account from `/register`.
+
 ## Database
 
 For a DB-engineering-focused schema/query guide,
@@ -145,7 +162,7 @@ see [how_db_works.md](./documentation/how_db_works.md).
 
 ## Example Logs
 
-Sample logs are in:
+Some sample logs are located in:
 
 - `examples/zscaler-sample.log` (default)
 - `examples/zscaler-sample2.log` (shorter)

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { z } from "zod";
 import { runMigrations } from "@/lib/db";
 import { enqueueUploadProcessing } from "@/lib/ingestion";
@@ -65,7 +65,9 @@ export async function POST(req: Request) {
 
   const job = await createIngestionJob(upload.id);
 
-  enqueueUploadProcessing(upload.id, fileText);
+  after(() => {
+    enqueueUploadProcessing(upload.id, fileText);
+  });
 
   return NextResponse.json(
     {
