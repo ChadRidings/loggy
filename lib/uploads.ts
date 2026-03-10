@@ -111,7 +111,38 @@ export async function insertEvents(uploadId: string, events: ParsedEventInput[])
     return;
   }
 
-  for (const event of events) {
+  const chunkSize = 500;
+
+  for (let start = 0; start < events.length; start += chunkSize) {
+    const chunk = events.slice(start, start + chunkSize);
+    const values: unknown[] = [];
+    const tuples: string[] = [];
+
+    chunk.forEach((event, index) => {
+      const offset = index * 15;
+      values.push(
+        uploadId,
+        event.lineNumber,
+        event.timestamp,
+        event.srcIp,
+        event.userIdentifier,
+        event.url,
+        event.domain,
+        event.httpMethod,
+        event.action,
+        event.statusCode,
+        event.bytesOut,
+        event.userAgent,
+        event.severity,
+        event.rawLine,
+        event.parseWarning
+      );
+
+      tuples.push(
+        `($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, $${offset + 5}, $${offset + 6}, $${offset + 7}, $${offset + 8}, $${offset + 9}, $${offset + 10}, $${offset + 11}, $${offset + 12}, $${offset + 13}, $${offset + 14}, NOW() + INTERVAL '30 days', $${offset + 15})`
+      );
+    });
+
     await query(
       `
         INSERT INTO events (
@@ -132,25 +163,9 @@ export async function insertEvents(uploadId: string, events: ParsedEventInput[])
           raw_line_expires_at,
           parse_warning
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW() + INTERVAL '30 days', $15)
+        VALUES ${tuples.join(", ")}
       `,
-      [
-        uploadId,
-        event.lineNumber,
-        event.timestamp,
-        event.srcIp,
-        event.userIdentifier,
-        event.url,
-        event.domain,
-        event.httpMethod,
-        event.action,
-        event.statusCode,
-        event.bytesOut,
-        event.userAgent,
-        event.severity,
-        event.rawLine,
-        event.parseWarning
-      ]
+      values
     );
   }
 }

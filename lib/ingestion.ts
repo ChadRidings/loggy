@@ -94,8 +94,7 @@ export function enqueueUploadProcessing(uploadId: string, fileContent: string): 
   }
 
   inFlightJobs.add(uploadId);
-
-  setTimeout(async () => {
+  void (async () => {
     try {
       await runMigrations();
       await markUploadProcessing(uploadId);
@@ -116,5 +115,5 @@ export function enqueueUploadProcessing(uploadId: string, fileContent: string): 
     } finally {
       inFlightJobs.delete(uploadId);
     }
-  }, 0);
+  })();
 }
