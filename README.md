@@ -82,7 +82,7 @@ OPENAI_MODEL=gpt-4.1-mini
 
 ## AI Usage
 
-For a full end-to-end walkthrough, see [how_ai_works.md](./how_ai_works.md).
+For a full end-to-end walkthrough, see [how_ai_works.md](./documentation/how_ai_works.md).
 
 ### Where AI is used
 
@@ -138,6 +138,11 @@ npm run typecheck
 npm run lint
 ```
 
+## Database
+
+For a DB-engineering-focused schema/query guide,
+see [how_db_works.md](./documentation/how_db_works.md).
+
 ## Example Logs
 
 Sample logs are in:
@@ -150,6 +155,7 @@ Sample logs are in:
 
 - Database schema is auto-bootstrapped by migration logic on first DB-backed request.
 - LLM enrichment is feature-flagged and optional for local development.
+- For a DB-engineering-focused schema/query guide, see [how_db_works.md](./documentation/how_db_works.md).
 
 ## Implementation Plans
 
