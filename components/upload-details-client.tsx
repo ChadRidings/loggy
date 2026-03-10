@@ -103,6 +103,14 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
     [filters]
   );
 
+  /**
+   * We use useInfiniteQuery for events to enable cursor-based pagination and infinite scrolling.
+   * The timeline and anomalies are expected to be small enough to load entirely, so we use useQuery for those.
+   * The events query is also refetched every 3 seconds while the upload is processing or queued, to provide near-real-time updates.
+   * The timeline and anomalies queries are also refetched on the same interval, but they will likely not change as frequently as events, so this is more of a safety measure to ensure the UI stays up to date when processing finishes.
+   * When the upload status transitions from processing/queued to a finished state, we invalidate all three queries to ensure we have the latest data.
+   * The events query also resets to the first page whenever the filters change, to provide a consistent user experience when applying new filters.
+   */
   const eventsQuery = useInfiniteQuery({
     queryKey: ["events", uploadId, eventFilterParams, processingRefreshTick],
     queryFn: ({ pageParam }) =>

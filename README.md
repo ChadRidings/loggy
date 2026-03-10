@@ -14,13 +14,19 @@ Loggy is a full-stack cybersecurity log analysis app built with Next.js, Postgre
 
 ## Tech Stack
 
-- Next.js 16 + React 19 + TypeScript
-- NextAuth (credentials)
-- PostgreSQL + `pg`
-- Zod validation
-- TanStack Query + Zustand
-- Tailwind CSS
-- Vitest
+- **Framework**: NEXT.js 16 (App Router) + React 19
+- **UI**: Radix UI
+- **Language**: TypeScript
+- **CSS**: Tailwind CSS 4
+- **State Management**: Zustand
+- **Authentication**: NextAuth.js
+- **Password Security**: bcryptjs
+- **Typechecking**: TypeScript (`tsc --noEmit`)
+- **Validation**: Zod
+- **Caching**: TanStack Query (+ React Query Devtools for local debugging)
+- **Database**: PostgreSQL via `pg`
+- **Testing**: Vitest
+- **Linting**: ESLint + Prettier
 
 ## Local Setup
 
