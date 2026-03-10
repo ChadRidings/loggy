@@ -35,7 +35,7 @@ async function deleteUpload(uploadId: string): Promise<void> {
 }
 
 export function ArchiveClient() {
-  const pageSize = 10;
+  const pageSize = 5;
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<UploadRecord | null>(null);

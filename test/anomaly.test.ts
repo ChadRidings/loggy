@@ -22,6 +22,7 @@ function makeEvent(overrides: Partial<ParsedEventInput>): ParsedEventInput {
 }
 
 describe("detectAnomalies", () => {
+  // Ensures deny-heavy traffic triggers the high_deny_ratio heuristic and stays heuristic-only when no LLM patching is applied.
   it("detects deny ratio anomalies", async () => {
     const events = Array.from({ length: 20 }).map((_, index) =>
       makeEvent({ action: index < 14 ? "DENY" : "ALLOW", statusCode: index < 14 ? 403 : 200, srcIp: `10.0.0.${index % 4}` })
@@ -33,6 +34,7 @@ describe("detectAnomalies", () => {
     expect(anomalies.every((anomaly) => anomaly.detectionSource === "heuristic")).toBe(true);
   });
 
+  // Confirms anomaly detection is safe on empty inputs and returns no findings.
   it("handles empty events", async () => {
     const anomalies = await detectAnomalies([]);
     expect(anomalies).toHaveLength(0);

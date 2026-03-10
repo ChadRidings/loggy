@@ -119,6 +119,8 @@ This is an application built with utilizing the following tools: [React](https:/
 
 - Operate as a high-level Staff Engineer and treat every task with a high-level of rigor.
 - Always check package.json for version numbers before using logic.
+- Always check AGENTS.md for project constraints.
+- Ensure integrity of answers by using official documentation linked in AGENTS.md as a reference point.
 - Always give PR summaries in .md format.
 - Never share values in the .env files publicly.
 

@@ -44,6 +44,7 @@ describe("authOptions", () => {
     vi.resetModules();
   });
 
+  // Ensures authorize rejects malformed credentials early and never calls user verification.
   it("returns null when authorize receives invalid credentials payload", async () => {
     const { authOptions, verifyUserPassword } = await loadAuthModule();
     const authorize = getAuthorize(authOptions);
@@ -54,6 +55,7 @@ describe("authOptions", () => {
     expect(verifyUserPassword).not.toHaveBeenCalled();
   });
 
+  // Verifies authorize forwards validated credentials to verifyUserPassword and returns the resolved user.
   it("delegates valid credentials to verifyUserPassword and returns the user", async () => {
     const { authOptions, verifyUserPassword } = await loadAuthModule();
     const authorize = getAuthorize(authOptions);
@@ -69,6 +71,7 @@ describe("authOptions", () => {
     expect(result).toEqual({ id: "user-1", email: "alice@example.com" });
   });
 
+  // Confirms jwt callback overwrites token identity fields from the signed-in user object.
   it("sets token sub and email in jwt callback when user exists", async () => {
     const { authOptions } = await loadAuthModule();
     const token = { sub: "existing", email: "old@example.com" };
@@ -86,6 +89,7 @@ describe("authOptions", () => {
     expect(result).toEqual({ sub: "user-1", email: "alice@example.com" });
   });
 
+  // Ensures jwt callback leaves existing token fields unchanged when no user is supplied.
   it("preserves token in jwt callback when user does not exist", async () => {
     const { authOptions } = await loadAuthModule();
     const token = { sub: "user-2", email: "keep@example.com" };
@@ -103,6 +107,7 @@ describe("authOptions", () => {
     expect(result).toEqual({ sub: "user-2", email: "keep@example.com" });
   });
 
+  // Verifies session callback maps token.sub into session.user.id for client-side user identity access.
   it("copies token.sub to session.user.id when both are present", async () => {
     const { authOptions } = await loadAuthModule();
     const session = {
@@ -125,6 +130,7 @@ describe("authOptions", () => {
     expect((result as { user?: { id?: string } } | undefined)?.user?.id).toBe("user-9");
   });
 
+  // Confirms session callback does not inject an id when token.sub is absent, preserving the existing session payload.
   it("does not set session.user.id when token.sub is missing", async () => {
     const { authOptions } = await loadAuthModule();
     const session = {
