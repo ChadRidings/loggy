@@ -1,6 +1,6 @@
 # Loggy
 
-Loggy is a full-stack cybersecurity log analysis app built with Next.js, PostgreSQL, NextAuth, TanStack Query, and Zustand.
+Loggy is a full-stack cybersecurity log analysis platform that lets authenticated users upload raw `.log` and `.txt` network/security logs, process them through an asynchronous ingestion pipeline, normalize and store events in PostgreSQL, and review timeline, anomaly, and filtered event insights through a responsive Next.js dashboard with optional LLM-assisted anomaly enrichment.
 
 ## Features
 
@@ -56,6 +56,14 @@ cp .env.example .env.local
 
 ```bash
 npm run dev
+```
+
+4. (Optional) Verify local setup:
+
+```bash
+npm run typecheck
+npm run test
+npm run lint
 ```
 
 ## Environment Variables
@@ -114,6 +122,7 @@ If `ENABLE_LLM_ANOMALY=false`, `OPENAI_API_KEY` is unset, or the LLM call fails:
 - `POST /api/uploads` (returns `202`)
 - `GET /api/uploads`
 - `GET /api/uploads/:id`
+- `DELETE /api/uploads/:id`
 - `GET /api/uploads/:id/events` (cursor pagination)
 - `GET /api/uploads/:id/timeline`
 - `GET /api/uploads/:id/anomalies`
@@ -126,6 +135,7 @@ npm run build
 npm run start
 npm run test
 npm run typecheck
+npm run lint
 ```
 
 ## Example Logs
