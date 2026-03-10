@@ -160,8 +160,8 @@ Setup guide: [deployment_vercel_neon.md](./documentation/deployment_vercel_neon.
 
 ### Live Demo
 
-- URL: `https://loggy-theta.vercel.app/`
-- Users can register a new account from `/register`.
+- URL: [https://loggy-theta.vercel.app/](https://loggy-theta.vercel.app/)
+- Users can register a new account from [/register](https://loggy-theta.vercel.app/register).
 
 ## Database
 
