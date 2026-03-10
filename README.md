@@ -150,3 +150,8 @@ Sample logs are in:
 
 - Database schema is auto-bootstrapped by migration logic on first DB-backed request.
 - LLM enrichment is feature-flagged and optional for local development.
+
+## Implementation Plans
+
+- Implementation plan is [implementation-plans/plan.md](./implementation-plans/plan.md).
+- Archiving plan is [implementation-plans/archiving_plan.md](./implementation-plans/archiving_plan.md).
