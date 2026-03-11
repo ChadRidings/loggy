@@ -82,13 +82,24 @@ This is an application built with utilizing the following tools: [React](https:/
 ├── docker-compose.yml
 ├── Dockerfile
 ├── documentation
+│   ├── deployment_vercel_neon.md
 │   ├── how_ai_works.md
-│   └── how_db_works.md
+│   ├── how_db_works.md
+│   └── how_queries_work.md
 ├── eslint.config.mjs
 ├── examples
 │   ├── zscaler-sample.log
 │   ├── zscaler-sample2.log
 │   └── zscaler-sample3.log
+├── hooks
+│   ├── query-keys.ts
+│   ├── useAnomaliesQuery.ts
+│   ├── useDeleteUploadMutation.ts
+│   ├── useEventsInfiniteQuery.ts
+│   ├── useTimelineQuery.ts
+│   ├── useUploadDetailsQuery.ts
+│   ├── useUploadMutation.ts
+│   └── useUploadsListQuery.ts
 ├── implementation-plans
 │   ├── archiving_plan.md
 │   └── plan.md
