@@ -1,45 +1,16 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Label, Select } from "radix-ui";
 import { CalendarIcon, UploadIcon, ThickArrowRightIcon } from "@radix-ui/react-icons";
 import { StatusBadge } from "@/components/status-badge";
-import type { UploadRecord } from "@/types/loggy";
-
-async function fetchUploads(): Promise<UploadRecord[]> {
-  const response = await fetch("/api/uploads", { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error("Failed to load uploads");
-  }
-
-  const data = (await response.json()) as { uploads: UploadRecord[] };
-  return data.uploads;
-}
-
-async function uploadFile(formData: FormData): Promise<{ uploadId: string; status: string }> {
-  const response = await fetch("/api/uploads", {
-    method: "POST",
-    body: formData,
-  });
-
-  const data = (await response.json()) as { uploadId?: string; status?: string; error?: string };
-
-  if (!response.ok || !data.uploadId || !data.status) {
-    throw new Error(data.error || "Upload failed");
-  }
-
-  return {
-    uploadId: data.uploadId,
-    status: data.status,
-  };
-}
+import { useUploadMutation } from "@/hooks/useUploadMutation";
+import { useUploadsListQuery } from "@/hooks/useUploadsListQuery";
 
 export function DashboardClient() {
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [sourceType, setSourceType] = useState("zscaler");
@@ -47,28 +18,16 @@ export function DashboardClient() {
   const sourceTypeTriggerId = "dashboard-source-type-trigger";
   const sourceTypeContentId = "dashboard-source-type-content";
 
-  const uploadsQuery = useQuery({
-    queryKey: ["uploads"],
-    queryFn: fetchUploads,
-    refetchInterval: (query) => {
-      const uploads = query.state.data;
-      const hasRunning = uploads?.some(
-        (upload) => upload.status === "processing" || upload.status === "queued"
-      );
-      return hasRunning ? 3000 : 0;
-    },
-  });
+  const uploadsQuery = useUploadsListQuery({ autoRefresh: true });
 
-  const uploadMutation = useMutation({
-    mutationFn: uploadFile,
+  const uploadMutation = useUploadMutation({
     onSuccess: (result) => {
       setError(null);
       setSelectedFile(null);
-      void queryClient.invalidateQueries({ queryKey: ["uploads"] });
       router.push(`/uploads/${result.uploadId}`);
     },
-    onError: (mutationError) => {
-      setError(mutationError instanceof Error ? mutationError.message : "Upload failed");
+    onError: (error) => {
+      setError(error.message);
     },
   });
 

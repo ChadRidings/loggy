@@ -4,6 +4,8 @@
 
 Loggy uses PostgreSQL (via `pg`) as the system of record for authentication, upload job lifecycle, parsed events, timeline aggregates, and anomaly outputs.
 
+For frontend TanStack Query hooks, cache keys, and invalidation behavior, see [how_queries_work.md](./how_queries_work.md).
+
 At a high level, the database is designed around one primary unit of work: an **upload**.
 
 - A `user` creates many `uploads`.

@@ -1,59 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Form, ScrollArea, Separator } from "radix-ui";
 import { useUploadUiStore } from "@/store/upload-ui-store";
 import { StatusBadge } from "@/components/status-badge";
 import { PaginationControls } from "@/components/pagination-controls";
+import { useAnomaliesQuery } from "@/hooks/useAnomaliesQuery";
+import { useEventsInfiniteQuery } from "@/hooks/useEventsInfiniteQuery";
+import { queryKeys } from "@/hooks/query-keys";
+import { useTimelineQuery } from "@/hooks/useTimelineQuery";
+import { useUploadDetailsQuery } from "@/hooks/useUploadDetailsQuery";
 import { formatAnomalyType } from "@/lib/anomaly-labels";
-import type { AnomalyRecord, EventRecord, TimelineRecord, UploadRecord } from "@/types/loggy";
-
-async function fetchUpload(uploadId: string): Promise<UploadRecord> {
-  const response = await fetch(`/api/uploads/${uploadId}`, { cache: "no-store" });
-  if (!response.ok) throw new Error("Failed to load upload");
-  const data = (await response.json()) as { upload: UploadRecord };
-  return data.upload;
-}
-
-async function fetchTimeline(uploadId: string): Promise<TimelineRecord[]> {
-  const response = await fetch(`/api/uploads/${uploadId}/timeline`, { cache: "no-store" });
-  if (!response.ok) throw new Error("Failed to load timeline");
-  const data = (await response.json()) as { timeline: TimelineRecord[] };
-  return data.timeline;
-}
-
-async function fetchAnomalies(uploadId: string): Promise<AnomalyRecord[]> {
-  const response = await fetch(`/api/uploads/${uploadId}/anomalies`, { cache: "no-store" });
-  if (!response.ok) throw new Error("Failed to load anomalies");
-  const data = (await response.json()) as { anomalies: AnomalyRecord[] };
-  return data.anomalies;
-}
-
-async function fetchEvents(args: {
-  uploadId: string;
-  cursor: string | null;
-  filters: Record<string, string>;
-}): Promise<{ events: EventRecord[]; nextCursor: string | null }> {
-  const params = new URLSearchParams();
-  params.set("limit", "100");
-
-  if (args.cursor) {
-    params.set("cursor", args.cursor);
-  }
-
-  Object.entries(args.filters).forEach(([key, value]) => {
-    if (value) {
-      params.set(key, value);
-    }
-  });
-
-  const response = await fetch(`/api/uploads/${args.uploadId}/events?${params.toString()}`, {
-    cache: "no-store",
-  });
-  if (!response.ok) throw new Error("Failed to load events");
-  return (await response.json()) as { events: EventRecord[]; nextCursor: string | null };
-}
 
 export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   const { filters, setFilter, resetFilters, selectedAnomalyId, setSelectedAnomalyId } =
@@ -66,31 +24,14 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   const [timelinePage, setTimelinePage] = useState(1);
   const [anomalyPage, setAnomalyPage] = useState(1);
 
-  const uploadQuery = useQuery({
-    queryKey: ["upload", uploadId],
-    queryFn: () => fetchUpload(uploadId),
-    refetchInterval: (query) => {
-      const status = query.state.data?.status;
-      return status === "processing" || status === "queued" ? 3000 : 0;
-    },
-  });
+  const uploadQuery = useUploadDetailsQuery(uploadId);
 
   const isProcessing =
     uploadQuery.data?.status === "processing" || uploadQuery.data?.status === "queued";
 
-  const timelineQuery = useQuery({
-    queryKey: ["timeline", uploadId],
-    queryFn: () => fetchTimeline(uploadId),
-    refetchInterval: isProcessing ? 3000 : false,
-    placeholderData: (previousData) => previousData,
-  });
+  const timelineQuery = useTimelineQuery(uploadId, isProcessing);
 
-  const anomalyQuery = useQuery({
-    queryKey: ["anomalies", uploadId],
-    queryFn: () => fetchAnomalies(uploadId),
-    refetchInterval: isProcessing ? 3000 : false,
-    placeholderData: (previousData) => previousData,
-  });
+  const anomalyQuery = useAnomaliesQuery(uploadId, isProcessing);
 
   const eventFilterParams = useMemo(
     () => ({
@@ -104,15 +45,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
     [filters]
   );
 
-  const eventsQuery = useInfiniteQuery({
-    queryKey: ["events", uploadId, eventFilterParams],
-    queryFn: ({ pageParam }) =>
-      fetchEvents({ uploadId, cursor: pageParam, filters: eventFilterParams }),
-    initialPageParam: null as string | null,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    refetchInterval: isProcessing ? 3000 : false,
-    placeholderData: (previousData) => previousData,
-  });
+  const eventsQuery = useEventsInfiniteQuery(uploadId, eventFilterParams, isProcessing);
 
   useEffect(() => {
     const currentStatus = uploadQuery.data?.status;
@@ -125,9 +58,9 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
         currentStatus === "failed");
 
     if (finishedNow) {
-      void queryClient.invalidateQueries({ queryKey: ["timeline", uploadId] });
-      void queryClient.invalidateQueries({ queryKey: ["anomalies", uploadId] });
-      void queryClient.invalidateQueries({ queryKey: ["events", uploadId] });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.timeline(uploadId) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.anomalies(uploadId) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.eventsBase(uploadId) });
     }
 
     previousStatusRef.current = currentStatus;

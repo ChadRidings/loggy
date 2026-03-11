@@ -1,6 +1,5 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -11,50 +10,25 @@ import {
 } from "@radix-ui/react-icons";
 import { AlertDialog, DropdownMenu } from "radix-ui";
 import { PaginationControls } from "@/components/pagination-controls";
+import { useDeleteUploadMutation } from "@/hooks/useDeleteUploadMutation";
+import { useUploadsListQuery } from "@/hooks/useUploadsListQuery";
 import type { UploadRecord } from "@/types/loggy";
-
-async function fetchUploads(): Promise<UploadRecord[]> {
-  const response = await fetch("/api/uploads", { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error("Failed to load uploads");
-  }
-
-  const data = (await response.json()) as { uploads: UploadRecord[] };
-  return data.uploads;
-}
-
-async function deleteUpload(uploadId: string): Promise<void> {
-  const response = await fetch(`/api/uploads/${uploadId}`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    const data = (await response.json().catch(() => null)) as { error?: string } | null;
-    throw new Error(data?.error || "Failed to delete upload");
-  }
-}
 
 export function ArchiveClient() {
   const pageSize = 5;
-  const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<UploadRecord | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const uploadsQuery = useQuery({
-    queryKey: ["uploads"],
-    queryFn: fetchUploads,
-  });
+  const uploadsQuery = useUploadsListQuery();
 
-  const deleteMutation = useMutation({
-    mutationFn: deleteUpload,
-    onSuccess: async () => {
+  const deleteMutation = useDeleteUploadMutation({
+    onSuccess: () => {
       setDeleteTarget(null);
       setDeleteError(null);
-      await queryClient.invalidateQueries({ queryKey: ["uploads"] });
     },
-    onError: (mutationError) => {
-      setDeleteError(mutationError instanceof Error ? mutationError.message : "Delete failed");
+    onError: (error) => {
+      setDeleteError(error.message);
     },
   });
 
