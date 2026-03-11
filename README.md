@@ -165,9 +165,7 @@ Setup guide: [deployment_vercel_neon.md](./documentation/deployment_vercel_neon.
 
 ## Database
 
-For a DB-engineering-focused schema/query guide,
-see [how_db_works.md](./documentation/how_db_works.md).
-For client-side query hooks and cache behavior, see [how_queries_work.md](./documentation/how_queries_work.md).
+For a DB-engineering-focused schema/query guide, see [how_db_works.md](./documentation/how_db_works.md).
 
 ## TanStack Query
 
