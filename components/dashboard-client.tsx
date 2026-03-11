@@ -6,7 +6,8 @@ import { useMemo, useState } from "react";
 import { Label, Select } from "radix-ui";
 import { CalendarIcon, UploadIcon, ThickArrowRightIcon } from "@radix-ui/react-icons";
 import { StatusBadge } from "@/components/status-badge";
-import { useUploadMutation, useUploadsQuery } from "@/hooks/use-uploads";
+import { useUploadMutation } from "@/hooks/useUploadMutation";
+import { useUploadsListQuery } from "@/hooks/useUploadsListQuery";
 
 export function DashboardClient() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export function DashboardClient() {
   const sourceTypeTriggerId = "dashboard-source-type-trigger";
   const sourceTypeContentId = "dashboard-source-type-content";
 
-  const uploadsQuery = useUploadsQuery({ autoRefresh: true });
+  const uploadsQuery = useUploadsListQuery({ autoRefresh: true });
 
   const uploadMutation = useUploadMutation({
     onSuccess: (result) => {

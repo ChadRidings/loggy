@@ -11,7 +11,7 @@ async function fetchUpload(uploadId: string): Promise<UploadRecord> {
   return data.upload;
 }
 
-export function useUploadQuery(uploadId: string) {
+export function useUploadDetailsQuery(uploadId: string) {
   return useQuery({
     queryKey: queryKeys.upload(uploadId),
     queryFn: () => fetchUpload(uploadId),

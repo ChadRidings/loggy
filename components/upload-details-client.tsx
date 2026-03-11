@@ -10,7 +10,7 @@ import { useAnomaliesQuery } from "@/hooks/useAnomaliesQuery";
 import { useEventsInfiniteQuery } from "@/hooks/useEventsInfiniteQuery";
 import { queryKeys } from "@/hooks/query-keys";
 import { useTimelineQuery } from "@/hooks/useTimelineQuery";
-import { useUploadQuery } from "@/hooks/useUploadQuery";
+import { useUploadDetailsQuery } from "@/hooks/useUploadDetailsQuery";
 import { formatAnomalyType } from "@/lib/anomaly-labels";
 
 export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
@@ -24,7 +24,7 @@ export function UploadDetailsClient({ uploadId }: { uploadId: string }) {
   const [timelinePage, setTimelinePage] = useState(1);
   const [anomalyPage, setAnomalyPage] = useState(1);
 
-  const uploadQuery = useUploadQuery(uploadId);
+  const uploadQuery = useUploadDetailsQuery(uploadId);
 
   const isProcessing =
     uploadQuery.data?.status === "processing" || uploadQuery.data?.status === "queued";

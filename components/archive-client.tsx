@@ -10,7 +10,8 @@ import {
 } from "@radix-ui/react-icons";
 import { AlertDialog, DropdownMenu } from "radix-ui";
 import { PaginationControls } from "@/components/pagination-controls";
-import { useDeleteUploadMutation, useUploadsQuery } from "@/hooks/use-uploads";
+import { useDeleteUploadMutation } from "@/hooks/useDeleteUploadMutation";
+import { useUploadsListQuery } from "@/hooks/useUploadsListQuery";
 import type { UploadRecord } from "@/types/loggy";
 
 export function ArchiveClient() {
@@ -19,7 +20,7 @@ export function ArchiveClient() {
   const [deleteTarget, setDeleteTarget] = useState<UploadRecord | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const uploadsQuery = useUploadsQuery();
+  const uploadsQuery = useUploadsListQuery();
 
   const deleteMutation = useDeleteUploadMutation({
     onSuccess: () => {
