@@ -48,9 +48,7 @@ npm install
 
 2. Copy env vars:
 
-```bash
-cp .env.example .env.local
-```
+Rename `.env.example` to `.env.local`
 
 3. Start dev server:
 
