@@ -1,0 +1,1 @@
+First, review the existing website structure — go through every component and identify what content and information each section needs. Then, do thorough research on humanoid robots (think Tesla Optimus, but our own version) and gather everything required to fill those sections: naming, branding, specs, pricing, use cases, and competitive positioning.
