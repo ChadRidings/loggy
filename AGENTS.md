@@ -79,13 +79,25 @@ This is an application built with utilizing the following tools: [React](https:/
 │   ├── providers.tsx
 │   ├── status-badge.tsx
 │   └── upload-details-client.tsx
+├── developer
+│   ├── documentation
+│   │   ├── deployment_vercel_neon.md
+│   │   ├── how_ai_works.md
+│   │   ├── how_db_works.md
+│   │   └── how_queries_work.md
+│   ├── implementation-plans
+│   │   ├── archiving_plan.md
+│   │   └── plan.md
+│   ├── prompts
+│   │   └── frontend-post
+│   │   ├── fill.md
+│   │   ├── normalize.md
+│   │   ├── research.md
+│   │   └── steps.txt
+│   └── skills
+│   └── frontend-design.md
 ├── docker-compose.yml
 ├── Dockerfile
-├── documentation
-│   ├── deployment_vercel_neon.md
-│   ├── how_ai_works.md
-│   ├── how_db_works.md
-│   └── how_queries_work.md
 ├── eslint.config.mjs
 ├── examples
 │   ├── zscaler-sample.log
@@ -100,9 +112,6 @@ This is an application built with utilizing the following tools: [React](https:/
 │   ├── useUploadDetailsQuery.ts
 │   ├── useUploadMutation.ts
 │   └── useUploadsListQuery.ts
-├── implementation-plans
-│   ├── archiving_plan.md
-│   └── plan.md
 ├── lib
 │   ├── anomaly-labels.ts
 │   ├── anomaly.ts
@@ -118,6 +127,7 @@ This is an application built with utilizing the following tools: [React](https:/
 ├── package-lock.json
 ├── package.json
 ├── postcss.config.mjs
+├── public
 ├── README.md
 ├── store
 │   └── upload-ui-store.ts
