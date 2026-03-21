@@ -95,6 +95,8 @@ This is an application built with utilizing the following tools: [React](https:/
 │   │   ├── research.md
 │   │   └── steps.txt
 │   └── skills
+│   ├── brand-guidelines.md
+│   ├── canvas-design.md
 │   └── frontend-design.md
 ├── docker-compose.yml
 ├── Dockerfile
@@ -144,11 +146,19 @@ This is an application built with utilizing the following tools: [React](https:/
 │   └── next-auth.d.ts
 └── vitest.config.ts
 
+## Skills
+
+All skills are listed in the [skills](./developer/skills) directory. Use these skills to guide the development of the project and new features.
+
+- [Brand Guidelines](./developer/skills/brand-guidelines.md)
+- [Canvas Design](./developer/skills/canvas-design.md)
+- [Frontend Design](./developer/skills/frontend-design.md)
+
 ## Code Conventions
 
 - Operate as a high-level Staff Engineer and treat every task with a high-level of rigor.
 - Always check package.json for version numbers before using logic.
-- Always check `AGENTS.md` for project constraints.
+- Always check `AGENTS.md` for project constraints, guidelines, and requirements.
 - Ensure integrity of answers by using official documentation linked in `AGENTS.md` as a reference point.
 - Always give PR summaries in `.md` format.
 - Never share values in the `.env` files publicly.
