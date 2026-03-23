@@ -32,6 +32,20 @@ This is an application built with utilizing the following tools: [React](https:/
 - **Caching**: TanStack Query (+ React Query Devtools for local debugging)
 - **Database**: PostgreSQL via `pg`
 
+## Dependencies
+
+- Use the [Zustand](https://zustand.docs.pmnd.rs/learn/getting-started/introduction) state manager for global state.
+- Use [Radix UI](https://www.radix-ui.com/primitives/docs/overview/introduction) for UI components.
+- Use [Tailwindcss](https://tailwindcss.com/docs/installation/using-vite) for styling.
+- Use [NextAuth.js](https://next-auth.js.org/getting-started/introduction) for authentication.
+- Use [Tanstack Query](https://tanstack.com/query/latest/docs/framework/react/overview) for caching.
+- Use [TanStack Query Devtools](https://tanstack.com/query/latest/docs/framework/react/devtools) for local query debugging when needed.
+- Use [Zod](https://zod.dev/) for validation.
+- Use [pg](https://node-postgres.com/) as the PostgreSQL client in the backend.
+- Use [bcryptjs](https://www.npmjs.com/package/bcryptjs) for password hashing and verification.
+- Use [ESLint](https://eslint.org/docs/latest/) and [prettier](https://prettier.io/docs/) for linting.
+- Use [Vitest](https://vitest.dev/guide/) for testing.
+
 ## Project Structure
 
 .
@@ -162,17 +176,3 @@ All skills are listed in the [skills](./developer/skills) directory. Use these s
 - Ensure integrity of answers by using official documentation linked in `AGENTS.md` as a reference point.
 - Always give PR summaries in `.md` format.
 - Never share values in the `.env` files publicly.
-
-## Dependencies
-
-- Use the [Zustand](https://zustand.docs.pmnd.rs/learn/getting-started/introduction) state manager for global state.
-- Use [Radix UI](https://www.radix-ui.com/primitives/docs/overview/introduction) for UI components.
-- Use [Tailwindcss](https://tailwindcss.com/docs/installation/using-vite) for styling.
-- Use [NextAuth.js](https://next-auth.js.org/getting-started/introduction) for authentication.
-- Use [Tanstack Query](https://tanstack.com/query/latest/docs/framework/react/overview) for caching.
-- Use [TanStack Query Devtools](https://tanstack.com/query/latest/docs/framework/react/devtools) for local query debugging when needed.
-- Use [Zod](https://zod.dev/) for validation.
-- Use [pg](https://node-postgres.com/) as the PostgreSQL client in the backend.
-- Use [bcryptjs](https://www.npmjs.com/package/bcryptjs) for password hashing and verification.
-- Use [ESLint](https://eslint.org/docs/latest/) and [prettier](https://prettier.io/docs/) for linting.
-- Use [Vitest](https://vitest.dev/guide/) for testing.
