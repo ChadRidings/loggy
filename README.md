@@ -37,6 +37,7 @@ docker compose up --build
 ```
 
 `docker compose down` = stop/remove containers and network
+
 `docker compose down -v` = stop/remove containers and also wipe persistent volume storage
 
 App: `http://localhost:3000`
