@@ -60,3 +60,14 @@ export type AnomalyRecord = {
   llm_reasoning_summary: string | null;
   created_at?: string;
 };
+
+export type SpotifyRepoActivity = {
+  rank: number;
+  name: string;
+  fullName: string;
+  htmlUrl: string;
+  description: string | null;
+  forksCount: number;
+  starsCount: number;
+  activityScore: number;
+};

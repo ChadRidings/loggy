@@ -1,4 +1,5 @@
 export const queryKeys = {
+  spotty: () => ["spotty"] as const,
   uploads: () => ["uploads"] as const,
   upload: (uploadId: string) => ["upload", uploadId] as const,
   timeline: (uploadId: string) => ["timeline", uploadId] as const,

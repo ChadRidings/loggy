@@ -8,6 +8,7 @@ import { NavigationMenu } from "radix-ui";
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/archive", label: "Archive" },
+  { href: "/spotty", label: "Spotty" },
 ];
 
 export function AppNavigation() {
