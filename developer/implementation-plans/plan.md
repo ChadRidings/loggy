@@ -4,7 +4,7 @@
 
 ### Installed stack and versions (from `package.json`)
 
-- Next.js: `16.1.6`
+- Next.js: `16.2.1`
 - React / React DOM: `19.2.4`
 - TypeScript: `5.9.2`
 - NextAuth.js (`next-auth`): `4.24.13`
