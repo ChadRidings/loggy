@@ -36,6 +36,9 @@ Loggy is a full-stack cybersecurity log analysis platform that lets authenticate
 docker compose up --build
 ```
 
+`docker compose down` = stop/remove containers and network
+`docker compose down -v` = stop/remove containers and also wipe persistent volume storage
+
 App: `http://localhost:3000`
 
 ### Option 2: Local Node + Local/Postgres Container
