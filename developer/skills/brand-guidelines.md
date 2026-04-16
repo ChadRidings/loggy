@@ -1,13 +1,13 @@
 ---
 name: brand-guidelines
-description: Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use it when brand colors or style guidelines, visual formatting, or company design standards apply.
+description: Applies loggys's official brand colors and typography to any sort of artifact that may benefit from having loggy's look-and-feel. Use it when brand colors or style guidelines, visual formatting, or company design standards apply.
 ---
 
-# Anthropic Brand Styling
+# Loggy Brand Styling
 
 ## Overview
 
-To access Anthropic's official brand identity and style resources, use this skill.
+To access loggy's official brand identity and style resources, use this skill.
 
 **Keywords**: branding, corporate identity, visual identity, post-processing, styling, brand colors, typography, Anthropic brand, visual formatting, visual design
 
